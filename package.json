@@ -1,0 +1,22 @@
+{
+  "name": "game-hub-project",
+  "version": "1.0.0",
+  "description": "Game Hub - Hybrid E-Commerce and C2C Game Barter Marketplace (IT32053 - Horizon Campus)",
+  "scripts": {
+    "start-backend": "cd backend && npm start",
+    "start-frontend": "cd frontend && npm run dev",
+    "install-all": "cd backend && npm install && cd ../frontend && npm install"
+  },
+  "keywords": [
+    "game-hub",
+    "e-commerce",
+    "b2c",
+    "c2c",
+    "game-exchange",
+    "react",
+    "nodejs",
+    "mongodb"
+  ],
+  "author": "Horizon Campus IT32053 Team",
+  "license": "ISC"
+}

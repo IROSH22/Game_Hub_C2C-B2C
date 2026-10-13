@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+*/node_modules/
+**/node_modules/
+
+# Environment Configuration Files (NEVER commit secrets to GitHub)
+.env
+*.env
+.env.*
+!.env.example
+backend/.env
+frontend/.env
+
+# Build Artifacts
+dist/
+build/
+*.local
+
+# Editor and OS Cache
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
