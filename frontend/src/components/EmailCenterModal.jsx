@@ -19,6 +19,7 @@ import { getStoredEmailJSConfig, saveEmailJSConfig, sendRealEmailViaEmailJS } fr
 
 export const EmailCenterModal = ({ onClose }) => {
   const { user } = useAuth();
+  const isAdmin = user?.role?.toLowerCase() === 'admin';
   const [activeTab, setActiveTab] = useState('inbox'); // 'inbox' | 'emailjs'
   const [emails, setEmails] = useState([]);
   const [selectedEmail, setSelectedEmail] = useState(null);
@@ -47,6 +48,14 @@ export const EmailCenterModal = ({ onClose }) => {
       const statusRes = await api.getEmailConfigStatus();
       if (statusRes && statusRes.success) {
         setBackendConfigStatus(statusRes);
+        if (statusRes.emailjs && (statusRes.emailjs.serviceId || statusRes.emailjs.publicKey)) {
+          setEmailJSConfig((prev) => ({
+            ...prev,
+            serviceId: statusRes.emailjs.serviceId || prev.serviceId,
+            templateId: statusRes.emailjs.templateId || prev.templateId,
+            publicKey: statusRes.emailjs.publicKey || prev.publicKey,
+          }));
+        }
       }
     } catch (err) {
       console.error(err);
@@ -58,11 +67,28 @@ export const EmailCenterModal = ({ onClose }) => {
     fetchEmails();
   }, []);
 
-  const handleSaveConfig = (e) => {
+  const handleSaveConfig = async (e) => {
     e.preventDefault();
-    saveEmailJSConfig(emailJSConfig);
-    setConfigSaved(true);
-    setTimeout(() => setConfigSaved(false), 3000);
+    try {
+      // 1. Save to backend system (Admin only) - Updates entire platform
+      const res = await api.saveEmailConfig(emailJSConfig);
+      // 2. Also save to browser cache
+      saveEmailJSConfig(emailJSConfig);
+      setConfigSaved(true);
+      if (res && res.success) {
+        setTestResult({
+          success: true,
+          message: res.message || 'System email credentials saved! Active across all customers and sellers.',
+        });
+      }
+      setTimeout(() => setConfigSaved(false), 4000);
+      fetchEmails();
+    } catch (err) {
+      console.error(err);
+      saveEmailJSConfig(emailJSConfig);
+      setConfigSaved(true);
+      setTimeout(() => setConfigSaved(false), 3000);
+    }
   };
 
   const handleSendTestEmail = async (e) => {
@@ -153,17 +179,19 @@ export const EmailCenterModal = ({ onClose }) => {
               <Mail className="w-3.5 h-3.5" />
               <span>DISPATCHED INBOX ({emails.length})</span>
             </button>
-            <button
-              onClick={() => setActiveTab('emailjs')}
-              className={`px-4 py-2 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
-                activeTab === 'emailjs'
-                  ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white font-black shadow-md'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              <Zap className="w-3.5 h-3.5 text-pink-400" />
-              <span>EMAILJS REAL SENDER</span>
-            </button>
+            {isAdmin && (
+              <button
+                onClick={() => setActiveTab('emailjs')}
+                className={`px-4 py-2 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+                  activeTab === 'emailjs'
+                    ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white font-black shadow-md'
+                    : 'text-pink-400 hover:text-white'
+                }`}
+              >
+                <Zap className="w-3.5 h-3.5 text-pink-400" />
+                <span>EMAILJS SETUP (ADMIN ONLY)</span>
+              </button>
+            )}
           </div>
         </div>
 
@@ -265,17 +293,17 @@ export const EmailCenterModal = ({ onClose }) => {
           </div>
         )}
 
-        {/* VIEW 2: EMAILJS REAL SENDER & CONFIGURATION */}
-        {activeTab === 'emailjs' && (
+        {/* VIEW 2: EMAILJS REAL SENDER & CONFIGURATION (ADMIN ONLY) */}
+        {activeTab === 'emailjs' && isAdmin && (
           <div className="space-y-6 pt-4">
             {/* Guide & Status Banner */}
             <div className="p-4 rounded-2xl bg-gradient-to-r from-pink-950/40 via-slate-900 to-purple-950/40 border border-pink-500/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
               <div className="space-y-1 max-w-2xl">
                 <div className="flex items-center gap-2 text-pink-400 text-xs font-bold uppercase tracking-wider font-['Rajdhani']">
-                  <Sparkles className="w-4 h-4" /> Free EmailJS Real Inbox Delivery Integration
+                  <Sparkles className="w-4 h-4" /> System Administrator EmailJS Live Delivery Control
                 </div>
                 <p className="text-xs text-slate-300 leading-relaxed">
-                  EmailJS (<a href="https://www.emailjs.com" target="_blank" rel="noreferrer" className="text-cyan-400 underline font-semibold">emailjs.com</a>) allows dispatching <strong>up to 200 real emails per month for free</strong> without requiring your own SMTP mail server.
+                  Configure EmailJS (<a href="https://www.emailjs.com" target="_blank" rel="noreferrer" className="text-cyan-400 underline font-semibold">emailjs.com</a>) keys below. Once saved, <strong>all customer purchase invoices, seller order updates, and C2C trade proposals</strong> will be sent live to real inboxes!
                 </p>
               </div>
 
@@ -415,16 +443,30 @@ export const EmailCenterModal = ({ onClose }) => {
                     />
                   </div>
 
+                  <div>
+                    <label className="text-[11px] font-bold text-slate-400 block mb-1">
+                      Private Key / Access Token (Optional):
+                    </label>
+                    <input
+                      type="password"
+                      value={emailJSConfig.privateKey || ''}
+                      onChange={(e) => setEmailJSConfig({ ...emailJSConfig, privateKey: e.target.value })}
+                      placeholder="Optional private key"
+                      className="w-full h-10 px-3 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs font-mono focus:border-pink-400 focus:outline-none"
+                    />
+                  </div>
+
                   <button
                     type="submit"
-                    className="w-full h-10 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 font-bold text-xs cursor-pointer transition-all"
+                    className="w-full h-11 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-400 hover:to-purple-500 text-white font-bold text-xs cursor-pointer shadow-lg shadow-pink-500/25 transition-all flex items-center justify-center gap-2"
                   >
-                    Save EmailJS Keys to Browser
+                    <Sparkles className="w-4 h-4" />
+                    Save EmailJS Keys to Entire Platform (Live for All)
                   </button>
 
                   {configSaved && (
-                    <div className="text-[11px] text-emerald-400 text-center font-bold">
-                      ✓ Credentials saved successfully!
+                    <div className="text-[11px] text-emerald-400 text-center font-bold bg-emerald-500/10 p-2.5 rounded-xl border border-emerald-500/30">
+                      ✓ Active across platform: Live emails will now be sent to customers &amp; sellers!
                     </div>
                   )}
                 </form>

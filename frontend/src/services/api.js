@@ -247,6 +247,15 @@ export const api = {
     return res.json();
   },
 
+  saveEmailConfig: async (config) => {
+    const res = await fetch(`${API_BASE}/emails/config`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify(config),
+    });
+    return res.json();
+  },
+
   testSendEmail: async (targetEmail, targetName) => {
     const res = await fetch(`${API_BASE}/emails/test-send`, {
       method: 'POST',
@@ -328,6 +337,22 @@ export const api = {
   getAdminExchanges: async () => {
     const res = await fetch(`${API_BASE}/admin/exchanges`, {
       headers: getHeaders(),
+    });
+    return res.json();
+  },
+
+  getSupabaseStatus: async () => {
+    const res = await fetch(`${API_BASE}/admin/supabase-status`, {
+      headers: getHeaders(),
+    });
+    return res.json();
+  },
+
+  saveSupabaseConfig: async (keys) => {
+    const res = await fetch(`${API_BASE}/admin/supabase-config`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify(keys),
     });
     return res.json();
   },

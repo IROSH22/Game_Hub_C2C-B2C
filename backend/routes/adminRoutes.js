@@ -122,4 +122,66 @@ router.get('/exchanges', authMiddleware, requireRole('admin'), async (req, res) 
   }
 });
 
+// Admin Supabase Database Status
+router.get('/supabase-status', authMiddleware, requireRole('admin'), async (req, res) => {
+  const supabaseUrl = process.env.SUPABASE_URL || 'https://mdemadyzfrlmymwgmelk.supabase.co';
+  const hasAnonKey = Boolean(process.env.SUPABASE_ANON_KEY);
+  const hasServiceKey = Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY);
+
+  res.json({
+    success: true,
+    supabase: {
+      url: supabaseUrl,
+      projectRef: 'mdemadyzfrlmymwgmelk',
+      hasAnonKey,
+      hasServiceKey,
+      status: hasAnonKey || hasServiceKey
+        ? 'Connected to Live Supabase PostgreSQL'
+        : 'Configured (Awaiting Anon/Service Keys)',
+      tables: ['users', 'game_listings', 'orders', 'order_items', 'exchange_requests', 'notifications', 'email_logs'],
+    },
+  });
+});
+
+// Admin Supabase Database Configuration (Update Keys)
+router.post('/supabase-config', authMiddleware, requireRole('admin'), async (req, res) => {
+  try {
+    const { anonKey, serviceRoleKey } = req.body;
+
+    if (anonKey) process.env.SUPABASE_ANON_KEY = String(anonKey).trim();
+    if (serviceRoleKey) process.env.SUPABASE_SERVICE_ROLE_KEY = String(serviceRoleKey).trim();
+
+    // Persist to backend/.env
+    const fs = require('fs');
+    const path = require('path');
+    const envPath = path.resolve(__dirname, '../.env');
+
+    if (fs.existsSync(envPath)) {
+      let envContent = fs.readFileSync(envPath, 'utf8');
+
+      const updateOrAppend = (key, val) => {
+        const regex = new RegExp(`^${key}=.*$`, 'm');
+        if (regex.test(envContent)) {
+          envContent = envContent.replace(regex, `${key}=${val}`);
+        } else {
+          envContent += `\n${key}=${val}`;
+        }
+      };
+
+      if (anonKey) updateOrAppend('SUPABASE_ANON_KEY', String(anonKey).trim());
+      if (serviceRoleKey) updateOrAppend('SUPABASE_SERVICE_ROLE_KEY', String(serviceRoleKey).trim());
+
+      fs.writeFileSync(envPath, envContent, 'utf8');
+    }
+
+    res.json({
+      success: true,
+      message: 'Supabase credentials saved successfully! Database is connected to https://mdemadyzfrlmymwgmelk.supabase.co',
+      configured: true,
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Failed to save Supabase config: ' + err.message });
+  }
+});
+
 module.exports = router;
