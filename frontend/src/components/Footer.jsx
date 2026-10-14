@@ -19,7 +19,7 @@ export const Footer = () => {
           {/* Brand Info */}
           <div className="space-y-3 md:col-span-1">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-cyan-500 to-pink-500 p-0.5">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-sky-500 to-cyan-500 p-0.5">
                 <div className="w-full h-full bg-slate-950 rounded-[7px] flex items-center justify-center">
                   <Gamepad2 className="w-4 h-4 text-cyan-400" />
                 </div>
@@ -48,7 +48,7 @@ export const Footer = () => {
               </p>
               <div className="space-y-1 text-[11px]">
                 <p><span className="text-slate-500 font-medium">Hotline:</span> <span className="text-cyan-400 font-semibold">+94 11 234 5678</span></p>
-                <p><span className="text-slate-500 font-medium">Email:</span> <span className="text-pink-400 font-semibold">support@gamehub.lk</span></p>
+                <p><span className="text-slate-500 font-medium">Email:</span> <span className="text-sky-400 font-semibold">support@gamehub.lk</span></p>
                 <p><span className="text-slate-500 font-medium">Hub:</span> <span className="text-slate-300">Colombo 03, Sri Lanka</span></p>
               </div>
               <div className="pt-2 border-t border-slate-900">
@@ -84,8 +84,8 @@ export const Footer = () => {
               </div>
 
               {/* Feature 2 */}
-              <div className="p-3 rounded-xl bg-slate-900/80 border border-pink-500/20 hover:border-pink-500/40 transition-all flex items-start gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-pink-500/10 border border-pink-500/30 text-pink-400 flex items-center justify-center shrink-0 mt-0.5">
+              <div className="p-3 rounded-xl bg-slate-900/80 border border-amber-500/20 hover:border-amber-500/40 transition-all flex items-start gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center shrink-0 mt-0.5">
                   <Repeat className="w-4 h-4" />
                 </div>
                 <div>
@@ -110,8 +110,8 @@ export const Footer = () => {
               </div>
 
               {/* Feature 4 */}
-              <div className="p-3 rounded-xl bg-slate-900/80 border border-purple-500/20 hover:border-purple-500/40 transition-all flex items-start gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-purple-500/10 border border-purple-500/30 text-purple-400 flex items-center justify-center shrink-0 mt-0.5">
+              <div className="p-3 rounded-xl bg-slate-900/80 border border-sky-500/20 hover:border-sky-500/40 transition-all flex items-start gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-sky-500/10 border border-sky-500/30 text-sky-400 flex items-center justify-center shrink-0 mt-0.5">
                   <CreditCard className="w-4 h-4" />
                 </div>
                 <div>
@@ -128,7 +128,7 @@ export const Footer = () => {
         <div className="pt-6 border-t border-slate-900 text-center text-[11px] text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-2">
           <div>© 2026 Game Hub Hybrid E-Commerce Platform. All Rights Reserved.</div>
           <div className="flex items-center gap-1 text-slate-400">
-            Engineered with <Heart className="w-3.5 h-3.5 text-pink-500 fill-pink-500" /> for Gamers &amp; Collectors
+            Engineered with <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500" /> for Gamers &amp; Collectors
           </div>
         </div>
       </div>

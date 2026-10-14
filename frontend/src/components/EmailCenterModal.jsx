@@ -192,11 +192,11 @@ export const EmailCenterModal = ({ onClose }) => {
                 onClick={() => setActiveTab('emailjs')}
                 className={`px-4 py-2 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
                   activeTab === 'emailjs'
-                    ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white font-black shadow-md'
-                    : 'text-pink-400 hover:text-white'
+                    ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white font-black shadow-md'
+                    : 'text-sky-400 hover:text-white'
                 }`}
               >
-                <Zap className="w-3.5 h-3.5 text-pink-400" />
+                <Zap className="w-3.5 h-3.5 text-sky-400" />
                 <span>EMAILJS SETUP (ADMIN ONLY)</span>
               </button>
             )}
@@ -305,13 +305,13 @@ export const EmailCenterModal = ({ onClose }) => {
         {activeTab === 'emailjs' && isAdmin && (
           <div className="space-y-6 pt-4">
             {/* Guide & Status Banner */}
-            <div className="p-4 rounded-2xl bg-gradient-to-r from-pink-950/40 via-slate-900 to-purple-950/40 border border-pink-500/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div className="p-4 rounded-2xl bg-slate-900/90 border border-slate-750 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
               <div className="space-y-1 max-w-2xl">
-                <div className="flex items-center gap-2 text-pink-400 text-xs font-bold uppercase tracking-wider font-['Rajdhani']">
+                <div className="flex items-center gap-2 text-sky-400 text-xs font-bold uppercase tracking-wider font-['Rajdhani']">
                   <Sparkles className="w-4 h-4" /> System Administrator EmailJS Live Delivery Control
                 </div>
                 <p className="text-xs text-slate-300 leading-relaxed">
-                  Configure EmailJS (<a href="https://www.emailjs.com" target="_blank" rel="noreferrer" className="text-cyan-400 underline font-semibold">emailjs.com</a>) keys below. Once saved, <strong>all customer purchase invoices, seller order updates, and game trade proposals</strong> will be sent live to real inboxes!
+                  Configure EmailJS (<a href="https://www.emailjs.com" target="_blank" rel="noreferrer" className="text-sky-400 underline font-semibold">emailjs.com</a>) keys below. Once saved, <strong>all customer purchase invoices, seller order updates, and game trade proposals</strong> will be sent live to real inboxes!
                 </p>
               </div>
 
@@ -319,7 +319,7 @@ export const EmailCenterModal = ({ onClose }) => {
                 href="https://dashboard.emailjs.com/sign-up"
                 target="_blank"
                 rel="noreferrer"
-                className="px-4 py-2 rounded-xl bg-pink-500 hover:bg-pink-400 text-white font-bold text-xs flex items-center gap-1.5 shrink-0 transition-all cursor-pointer shadow-md shadow-pink-500/20"
+                className="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs flex items-center gap-1.5 shrink-0 transition-all cursor-pointer shadow-md shadow-sky-500/20"
               >
                 <span>Get Free EmailJS Keys</span>
                 <ExternalLink className="w-3.5 h-3.5" />
@@ -379,7 +379,7 @@ export const EmailCenterModal = ({ onClose }) => {
                         onClick={() => setTestEmailType('order_receipt')}
                         className={`py-2 px-3 rounded-xl border text-xs font-bold font-['Rajdhani'] cursor-pointer transition-all flex items-center justify-center gap-1.5 ${
                           testEmailType === 'order_receipt'
-                            ? 'bg-purple-500/20 border-purple-400 text-purple-300 shadow-md shadow-purple-500/10'
+                            ? 'bg-sky-500/20 border-sky-400 text-sky-300 shadow-md shadow-sky-500/10'
                             : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white'
                         }`}
                       >
@@ -429,7 +429,7 @@ export const EmailCenterModal = ({ onClose }) => {
               <div className="glass-panel p-5 rounded-2xl border border-slate-800 space-y-4">
                 <div className="flex items-center justify-between">
                   <h3 className="font-bold text-white text-sm font-['Rajdhani'] uppercase tracking-wider flex items-center gap-1.5">
-                    <Settings className="w-4 h-4 text-pink-400" />
+                    <Settings className="w-4 h-4 text-sky-400" />
                     EmailJS Multi-Template Setup
                   </h3>
                   <span className="text-[10px] text-slate-400 font-mono">
@@ -451,15 +451,15 @@ export const EmailCenterModal = ({ onClose }) => {
                       value={emailJSConfig.serviceId || ''}
                       onChange={(e) => setEmailJSConfig({ ...emailJSConfig, serviceId: e.target.value })}
                       placeholder="service_gamehub"
-                      className="w-full h-10 px-3 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs font-mono focus:border-pink-400 focus:outline-none"
+                      className="w-full h-10 px-3 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs font-mono focus:border-sky-400 focus:outline-none"
                     />
                   </div>
 
                   {/* Template 1: Order Confirmation */}
-                  <div className="p-3 rounded-xl bg-purple-950/30 border border-purple-500/30 space-y-1">
-                    <label className="text-[11px] font-bold text-purple-300 flex items-center justify-between">
+                  <div className="p-3 rounded-xl bg-slate-950/70 border border-slate-800 space-y-1">
+                    <label className="text-[11px] font-bold text-sky-300 flex items-center justify-between">
                       <span>🛒 Template 1: Order Confirmation ID</span>
-                      <span className="text-[9px] px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-200 font-mono">Purchases</span>
+                      <span className="text-[9px] px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-200 font-mono">Purchases</span>
                     </label>
                     <input
                       type="text"
@@ -472,7 +472,7 @@ export const EmailCenterModal = ({ onClose }) => {
                         })
                       }
                       placeholder="template_order_xxx"
-                      className="w-full h-9 px-3 rounded-lg bg-slate-950 border border-purple-700/60 text-white text-xs font-mono focus:border-purple-400 focus:outline-none"
+                      className="w-full h-9 px-3 rounded-lg bg-slate-950 border border-slate-700 text-white text-xs font-mono focus:border-sky-400 focus:outline-none"
                     />
                     <p className="text-[10px] text-slate-400">
                       Dispatched when a gamer completes checkout or when seller marks status as accepted/shipped.
@@ -506,7 +506,7 @@ export const EmailCenterModal = ({ onClose }) => {
                       value={emailJSConfig.publicKey || ''}
                       onChange={(e) => setEmailJSConfig({ ...emailJSConfig, publicKey: e.target.value })}
                       placeholder="user_xxx / public_key"
-                      className="w-full h-10 px-3 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs font-mono focus:border-pink-400 focus:outline-none"
+                      className="w-full h-10 px-3 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs font-mono focus:border-sky-400 focus:outline-none"
                     />
                   </div>
 
@@ -519,13 +519,13 @@ export const EmailCenterModal = ({ onClose }) => {
                       value={emailJSConfig.privateKey || ''}
                       onChange={(e) => setEmailJSConfig({ ...emailJSConfig, privateKey: e.target.value })}
                       placeholder="Optional private key"
-                      className="w-full h-10 px-3 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs font-mono focus:border-pink-400 focus:outline-none"
+                      className="w-full h-10 px-3 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs font-mono focus:border-sky-400 focus:outline-none"
                     />
                   </div>
 
                   <button
                     type="submit"
-                    className="w-full h-11 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-400 hover:to-purple-500 text-white font-bold text-xs cursor-pointer shadow-lg shadow-pink-500/25 transition-all flex items-center justify-center gap-2"
+                    className="w-full h-11 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-bold text-xs cursor-pointer shadow-lg shadow-sky-500/25 transition-all flex items-center justify-center gap-2"
                   >
                     <Sparkles className="w-4 h-4" />
                     Save EmailJS Multi-Templates to Entire Platform
@@ -552,7 +552,7 @@ export const EmailCenterModal = ({ onClose }) => {
                   Go to EmailJS &gt; Email Services &gt; Add Service &gt; Choose Gmail / Outlook. Copy your <code>service_id</code>.
                 </div>
                 <div className="p-2.5 rounded-xl bg-slate-950 border border-slate-800">
-                  <strong className="text-pink-400 block mb-1">2. Create Email Template</strong>
+                  <strong className="text-amber-400 block mb-1">2. Create Email Template</strong>
                   Go to Email Templates &gt; Create New. In content, use <code>{'{{message}}'}</code> and <code>{'{{to_email}}'}</code>. Copy <code>template_id</code>.
                 </div>
                 <div className="p-2.5 rounded-xl bg-slate-950 border border-slate-800">

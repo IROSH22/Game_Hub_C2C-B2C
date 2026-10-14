@@ -56,7 +56,7 @@ export const ExchangeHub = ({ onRequestExchange, onOpenListTrade, onOpenMyTrades
     <div className="py-8 px-4 sm:px-6 lg:px-10 max-w-[1600px] w-full mx-auto space-y-8">
       {/* C2C Swap Zone Hero Banner */}
       <div className="relative glass-panel rounded-3xl p-6 sm:p-10 border border-slate-700/80 overflow-hidden shadow-2xl">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-amber-500/10 via-purple-600/10 to-transparent rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-amber-500/15 via-orange-600/10 to-transparent rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div className="space-y-3 max-w-2xl">

@@ -104,24 +104,24 @@ export const TradeChatModal = ({ trade, onClose }) => {
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
-      className="fixed inset-0 z-70 overflow-y-auto bg-slate-950/85 backdrop-blur-md p-3 sm:p-6 flex items-center justify-center cursor-pointer animate-in fade-in duration-200"
+      className="fixed inset-0 z-[100] bg-slate-950/90 backdrop-blur-md p-2 sm:p-4 flex flex-col items-center justify-center cursor-pointer overflow-hidden animate-in fade-in duration-200"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="relative w-full max-w-2xl bg-slate-900 border border-slate-700/80 rounded-3xl shadow-2xl overflow-hidden flex flex-col h-[85vh] max-h-[720px] cursor-default animate-in zoom-in-95 duration-200"
+        className="relative w-full max-w-2xl bg-slate-900 border border-slate-750 rounded-3xl shadow-2xl flex flex-col h-[90vh] max-h-[640px] my-auto overflow-hidden cursor-default animate-in zoom-in-95 duration-200"
       >
         {/* Header */}
-        <div className="p-4 sm:p-5 bg-gradient-to-r from-slate-900 via-indigo-950/50 to-slate-900 border-b border-slate-800 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3 min-w-0">
-            {/* Back Button */}
+        <div className="shrink-0 p-3.5 sm:p-4 bg-slate-900 border-b border-slate-800 flex items-center justify-between gap-2.5">
+          <div className="flex items-center gap-2.5 min-w-0">
+            {/* Prominent Back Button (Never Hidden) */}
             <button
               type="button"
               onClick={onClose}
-              className="px-3 py-2 rounded-xl bg-slate-800/90 hover:bg-slate-700 border border-slate-700 text-slate-200 hover:text-white text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm shrink-0"
+              className="px-3.5 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/50 text-amber-300 hover:text-amber-200 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm shrink-0"
               title="Return to Trade Desk (Esc)"
             >
-              <ArrowLeft className="w-4 h-4 text-cyan-400" />
-              <span className="hidden sm:inline">Back</span>
+              <ArrowLeft className="w-4 h-4 text-amber-400 shrink-0" />
+              <span>Back to Trades</span>
             </button>
 
             <div className="min-w-0">
@@ -136,7 +136,7 @@ export const TradeChatModal = ({ trade, onClose }) => {
               <p className="text-xs text-slate-400 flex items-center gap-1.5 truncate">
                 <span>With: <strong className="text-slate-200">{partnerName}</strong></span>
                 <span>•</span>
-                <span className="text-cyan-400 font-mono text-[11px] truncate">
+                <span className="text-amber-400 font-mono text-[11px] truncate">
                   {trade?.offeredListingId?.title || 'Game A'} ⇄ {trade?.wantedListingId?.title || 'Game B'}
                 </span>
               </p>
@@ -156,7 +156,7 @@ export const TradeChatModal = ({ trade, onClose }) => {
               type="button"
               onClick={onClose}
               className="p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white transition-all cursor-pointer"
-              title="Close Chat"
+              title="Close Chat (Esc)"
             >
               <X className="w-4 h-4" />
             </button>
@@ -164,16 +164,16 @@ export const TradeChatModal = ({ trade, onClose }) => {
         </div>
 
         {/* Security & Logistics Banner */}
-        <div className="px-4 py-2 bg-indigo-950/40 border-b border-indigo-900/30 flex items-center justify-between text-[11px] text-indigo-200">
-          <div className="flex items-center gap-1.5">
-            <ShieldCheck className="w-4 h-4 text-cyan-400 shrink-0" />
-            <span>Exchange Safety: Share delivery address, courier waybill number &amp; test disc condition.</span>
+        <div className="shrink-0 px-4 py-2 bg-slate-950/70 border-b border-slate-800 flex items-center justify-between text-[11px] text-slate-300">
+          <div className="flex items-center gap-1.5 truncate">
+            <ShieldCheck className="w-4 h-4 text-sky-400 shrink-0" />
+            <span className="truncate">Exchange Safety: Share delivery address, courier waybill number &amp; test disc condition.</span>
           </div>
-          <span className="text-[10px] text-cyan-400 font-mono hidden sm:inline">ESC to Close</span>
+          <span className="text-[10px] text-amber-400/90 font-mono shrink-0 ml-2">ESC to Close</span>
         </div>
 
-        {/* Messages Stream */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3.5 bg-slate-950/40">
+        {/* Messages Stream with min-h-0 so flexbox cannot push header offscreen */}
+        <div className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-5 space-y-3.5 bg-slate-950/50">
           {loading && messages.length === 0 ? (
             <div className="text-center py-16 text-slate-400 text-xs flex items-center justify-center gap-2">
               <RefreshCw className="w-4 h-4 animate-spin text-cyan-400" />
@@ -218,9 +218,9 @@ export const TradeChatModal = ({ trade, onClose }) => {
         </div>
 
         {/* Quick Suggestion Chips */}
-        <div className="px-4 py-2 bg-slate-900 border-t border-slate-800/80 flex items-center gap-1.5 overflow-x-auto no-scrollbar text-[10px]">
-          <span className="text-slate-500 flex items-center gap-1 shrink-0">
-            <Sparkles className="w-3 h-3 text-cyan-400" /> Quick replies:
+        <div className="shrink-0 px-3.5 py-2 bg-slate-900 border-t border-slate-800 flex items-center gap-1.5 overflow-x-auto no-scrollbar text-[10px]">
+          <span className="text-slate-400 flex items-center gap-1 shrink-0 font-medium">
+            <Sparkles className="w-3.5 h-3.5 text-amber-400" /> Quick replies:
           </span>
           <button
             type="button"
@@ -252,24 +252,35 @@ export const TradeChatModal = ({ trade, onClose }) => {
           </button>
         </div>
 
-        {/* Input Bar */}
-        <form onSubmit={handleSend} className="p-3 sm:p-4 bg-slate-900 border-t border-slate-800 flex items-center gap-2">
+        {/* Input Bar with Secondary Back Button as Fail-Safe */}
+        <form onSubmit={handleSend} className="shrink-0 p-3 sm:p-4 bg-slate-900 border-t border-slate-800 flex items-center gap-2 relative">
           {error && (
             <div className="absolute -top-7 left-4 right-4 text-center text-[10px] text-red-400 bg-red-950/90 border border-red-800 py-1 rounded-lg">
               {error}
             </div>
           )}
+          {/* Secondary Bottom Back Button */}
+          <button
+            type="button"
+            onClick={onClose}
+            className="py-3 px-3.5 rounded-2xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shrink-0"
+            title="Exit chat and return to trade proposals"
+          >
+            <ArrowLeft className="w-4 h-4 text-amber-400 shrink-0" />
+            <span className="hidden sm:inline">Back</span>
+          </button>
+
           <input
             type="text"
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             placeholder={`Message ${partnerName} about exchange & delivery...`}
-            className="flex-1 p-3 rounded-2xl bg-slate-950 border border-slate-700 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 font-sans"
+            className="flex-1 p-3 rounded-2xl bg-slate-950 border border-slate-700 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 font-sans"
           />
           <button
             type="submit"
             disabled={!inputText.trim() || sending}
-            className="btn-primary py-3 px-5 rounded-2xl text-xs font-bold shadow-lg shadow-cyan-500/25 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5"
+            className="btn-primary py-3 px-5 rounded-2xl text-xs font-bold shadow-lg shadow-sky-500/25 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5 shrink-0"
           >
             {sending ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
             <span className="hidden sm:inline">Send</span>

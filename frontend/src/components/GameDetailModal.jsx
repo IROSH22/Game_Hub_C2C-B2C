@@ -99,7 +99,7 @@ export const GameDetailModal = ({ game, onClose, onRequestExchange, onInstantBuy
                 <span className="px-2.5 py-1 rounded bg-slate-800 text-cyan-400 border border-cyan-500/30 text-xs font-bold font-mono">
                   {game.platform}
                 </span>
-                <span className="px-2.5 py-1 rounded bg-purple-500/10 text-purple-300 border border-purple-500/30 text-xs font-semibold">
+                <span className="px-2.5 py-1 rounded bg-sky-500/10 text-sky-300 border border-sky-500/30 text-xs font-semibold">
                   {game.genre}
                 </span>
                 <span className="px-2.5 py-1 rounded bg-amber-500/10 text-amber-300 border border-amber-500/30 text-xs font-semibold">

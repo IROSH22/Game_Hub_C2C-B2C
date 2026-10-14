@@ -144,7 +144,7 @@ export const ExchangeRequestModal = ({ targetGame, onClose, onSuccess, onOpenLis
             {/* Comparison Box */}
             <div className="grid grid-cols-2 gap-3 p-3 rounded-2xl bg-slate-950/70 border border-slate-800">
               <div className="space-y-1">
-                <div className="text-[10px] text-pink-400 font-bold uppercase">Game You Want</div>
+                <div className="text-[10px] text-amber-400 font-bold uppercase">Game You Want</div>
                 <img
                   src={targetGame?.imageUrl}
                   alt={targetGame?.title}
@@ -212,7 +212,7 @@ export const ExchangeRequestModal = ({ targetGame, onClose, onSuccess, onOpenLis
                 <select
                   value={selectedListingId}
                   onChange={(e) => setSelectedListingId(e.target.value)}
-                  className="w-full p-3 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-pink-500"
+                  className="w-full p-3 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-amber-400"
                 >
                   {myListings.map((g) => (
                     <option key={g._id} value={g._id}>
@@ -233,7 +233,7 @@ export const ExchangeRequestModal = ({ targetGame, onClose, onSuccess, onOpenLis
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="E.g., Mint condition disc, includes original map and case. Can ship tomorrow morning!"
                 rows={3}
-                className="w-full p-3 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs placeholder-slate-500 focus:outline-none focus:border-pink-500"
+                className="w-full p-3 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs placeholder-slate-500 focus:outline-none focus:border-amber-400"
               />
             </div>
 

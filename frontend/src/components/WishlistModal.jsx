@@ -35,7 +35,7 @@ export const WishlistModal = ({ onClose, onRequestExchange }) => {
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/85 backdrop-blur-md p-4 sm:p-6">
       <div className="min-h-full flex items-center justify-center py-6">
-        <div className="relative w-full max-w-3xl glass-panel rounded-3xl border border-pink-500/40 shadow-2xl p-6 sm:p-8 animate-in fade-in zoom-in-95 duration-200">
+        <div className="relative w-full max-w-3xl glass-panel rounded-3xl border border-slate-750 shadow-2xl p-6 sm:p-8 animate-in fade-in zoom-in-95 duration-200">
           <button
           onClick={onClose}
           className="absolute top-5 right-5 p-2 rounded-full bg-slate-900 border border-slate-700 text-slate-400 hover:text-white transition-all cursor-pointer"
@@ -43,8 +43,8 @@ export const WishlistModal = ({ onClose, onRequestExchange }) => {
           <X className="w-5 h-5" />
         </button>
 
-        <div className="flex items-center gap-2 mb-2 text-pink-400 font-bold uppercase tracking-wider text-xs font-['Rajdhani']">
-          <Heart className="w-4 h-4 fill-pink-400" />
+        <div className="flex items-center gap-2 mb-2 text-rose-400 font-bold uppercase tracking-wider text-xs font-['Rajdhani']">
+          <Heart className="w-4 h-4 fill-rose-400 text-rose-400" />
           Wishlist & AI Exchange Matching
         </div>
 
@@ -57,9 +57,9 @@ export const WishlistModal = ({ onClose, onRequestExchange }) => {
 
         {/* EXTRA MARKS FEATURE: SMART EXCHANGE MATCHING BANNER */}
         {matches.length > 0 && (
-          <div className="mb-6 p-4 rounded-2xl bg-gradient-to-r from-purple-950/60 via-pink-950/60 to-slate-900/60 border border-pink-500/40 space-y-3">
-            <div className="flex items-center gap-2 text-xs font-bold text-pink-300 uppercase tracking-wider">
-              <Sparkles className="w-4 h-4 text-pink-400 animate-spin" />
+          <div className="mb-6 p-4 rounded-2xl bg-gradient-to-r from-slate-900 via-amber-950/30 to-slate-900 border border-amber-500/30 space-y-3">
+            <div className="flex items-center gap-2 text-xs font-bold text-amber-300 uppercase tracking-wider">
+              <Sparkles className="w-4 h-4 text-amber-400 animate-spin" />
               Smart Barter Match Alert (Extra Marks Feature)
             </div>
 

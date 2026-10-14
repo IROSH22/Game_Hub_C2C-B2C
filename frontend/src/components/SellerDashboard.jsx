@@ -192,9 +192,9 @@ export const SellerDashboard = ({ onClose }) => {
             <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800">
               <div className="flex items-center justify-between text-xs text-slate-400 mb-1">
                 <span>Games Sold</span>
-                <Package className="w-4 h-4 text-purple-400" />
+                <Package className="w-4 h-4 text-sky-400" />
               </div>
-              <div className="text-2xl font-black text-purple-400 font-['Rajdhani']">
+              <div className="text-2xl font-black text-sky-400 font-['Rajdhani']">
                 {stats.totalItemsSold}
               </div>
             </div>
@@ -202,9 +202,9 @@ export const SellerDashboard = ({ onClose }) => {
             <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800">
               <div className="flex items-center justify-between text-xs text-slate-400 mb-1">
                 <span>Active Listings</span>
-                <TrendingUp className="w-4 h-4 text-pink-400" />
+                <TrendingUp className="w-4 h-4 text-amber-400" />
               </div>
-              <div className="text-2xl font-black text-pink-400 font-['Rajdhani']">
+              <div className="text-2xl font-black text-amber-400 font-['Rajdhani']">
                 {stats.activeListingsCount}
               </div>
             </div>

@@ -74,17 +74,17 @@ export const Navbar = ({
   return (
     <>
       {/* Top Announcement Bar */}
-      <div className="bg-gradient-to-r from-purple-950 via-slate-950 to-cyan-950 border-b border-cyan-500/20 py-1.5 px-4 sm:px-6 lg:px-10 text-center text-[11px] text-slate-300 overflow-hidden font-medium">
+      <div className="bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 border-b border-slate-800/80 py-1.5 px-4 sm:px-6 lg:px-10 text-center text-[11px] text-slate-300 overflow-hidden font-medium">
         <div className="max-w-[1600px] w-full mx-auto flex items-center justify-between gap-4">
-          <div className="hidden sm:flex items-center gap-1.5 text-cyan-400 font-bold tracking-wider">
-            <Zap className="w-3.5 h-3.5 fill-cyan-400 animate-pulse" />
+          <div className="hidden sm:flex items-center gap-1.5 text-sky-400 font-bold tracking-wider">
+            <Zap className="w-3.5 h-3.5 fill-sky-400 animate-pulse" />
             <span>HYBRID E-COMMERCE ECOSYSTEM</span>
           </div>
           <div className="flex items-center gap-2 truncate">
-            <span className="text-pink-400 font-bold">⚡ FREE EXPRESS SHIPPING</span> on orders over $60
-            <span className="text-slate-600">|</span>
-            <span className="text-cyan-400 font-bold">🎮 100% ESCROW PROTECTED</span> Game Barter & Trades
-            <span className="text-slate-600 hidden md:inline">|</span>
+            <span className="text-amber-400 font-bold">⚡ FREE EXPRESS SHIPPING</span> on orders over $60
+            <span className="text-slate-700">|</span>
+            <span className="text-sky-400 font-bold">🎮 100% ESCROW PROTECTED</span> Game Barter & Trades
+            <span className="text-slate-700 hidden md:inline">|</span>
             <span className="text-emerald-400 font-bold hidden md:inline">PROMO CODE: GAMER10 (10% OFF)</span>
           </div>
         </div>
@@ -98,17 +98,17 @@ export const Navbar = ({
             className="flex items-center gap-3 cursor-pointer group select-none shrink-0"
             onClick={() => setActiveView('store')}
           >
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 via-purple-600 to-pink-500 p-0.5 shadow-lg shadow-cyan-500/20 group-hover:shadow-cyan-400/40 transition-all">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-500 to-cyan-500 p-0.5 shadow-lg shadow-sky-500/20 group-hover:shadow-sky-400/40 transition-all">
               <div className="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
-                <Gamepad2 className="w-6 h-6 text-cyan-400 group-hover:scale-110 transition-transform" />
+                <Gamepad2 className="w-6 h-6 text-sky-400 group-hover:scale-110 transition-transform" />
               </div>
             </div>
             <div>
               <div className="flex items-center gap-1.5">
                 <span className="font-extrabold text-2xl tracking-wider text-white font-['Rajdhani']">
-                  GAME<span className="text-cyan-400">HUB</span>
+                  GAME<span className="text-sky-400">HUB</span>
                 </span>
-                <span className="text-[10px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded bg-pink-500/20 text-pink-400 border border-pink-500/30">
+                <span className="text-[10px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-400 border border-sky-500/30">
                   Hybrid
                 </span>
               </div>
@@ -124,7 +124,7 @@ export const Navbar = ({
               onClick={() => setActiveView('store')}
               className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
                 activeView === 'store'
-                  ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-slate-950 font-black shadow-md shadow-cyan-500/20'
+                  ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white font-black shadow-md shadow-sky-500/20'
                   : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
               }`}
             >
@@ -140,13 +140,13 @@ export const Navbar = ({
                 }}
                 className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
                   activeView === 'exchange'
-                    ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-md shadow-pink-500/20'
+                    ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-slate-950 font-black shadow-md shadow-amber-500/20'
                     : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
                 }`}
               >
-                <Repeat className="w-4 h-4 text-pink-400" />
+                <Repeat className="w-4 h-4 text-amber-400" />
                 <span>Game Swap Zone</span>
-                <span className="text-[9px] px-1.5 py-0.2 bg-purple-500/30 text-purple-300 rounded font-bold uppercase">
+                <span className="text-[9px] px-1.5 py-0.2 bg-amber-500/30 text-amber-300 rounded font-bold uppercase">
                   Trade
                 </span>
               </button>
@@ -188,12 +188,12 @@ export const Navbar = ({
             {/* Wishlist */}
             <button
               onClick={onOpenWishlist}
-              className="relative p-2 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-pink-400 transition-all cursor-pointer"
+              className="relative p-2 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-rose-400 transition-all cursor-pointer"
               title="Wishlist & Smart Matches"
             >
               <Heart className="w-4 h-4" />
               {user?.wishlist?.length > 0 && (
-                <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-pink-500 text-white text-[10px] font-bold flex items-center justify-center border border-slate-950">
+                <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-rose-500 text-white text-[10px] font-bold flex items-center justify-center border border-slate-950">
                   {user.wishlist.length}
                 </span>
               )}
@@ -426,7 +426,7 @@ export const Navbar = ({
                 }}
                 className="px-4 py-2.5 text-left rounded-xl text-xs font-bold text-slate-200 hover:bg-slate-800 flex items-center gap-2"
               >
-                <Repeat className="w-4 h-4 text-pink-400" />
+                <Repeat className="w-4 h-4 text-amber-400" />
                 Game Swap Zone
               </button>
             )}

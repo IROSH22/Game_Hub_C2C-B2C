@@ -158,7 +158,7 @@ export const HeroSlider = ({
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black font-['Rajdhani'] text-white tracking-wide leading-tight drop-shadow-md">
               {slide.title}
             </h1>
-            <h2 className="text-sm sm:text-lg text-pink-400 font-semibold tracking-wide mt-1">
+            <h2 className="text-sm sm:text-lg text-amber-400 font-semibold tracking-wide mt-1">
               {slide.subtitle}
             </h2>
           </div>
@@ -237,7 +237,7 @@ export const HeroSlider = ({
               onClick={() => setCurrentSlide(idx)}
               className={`h-2 rounded-full transition-all cursor-pointer ${
                 currentSlide === idx
-                  ? 'w-7 bg-gradient-to-r from-cyan-400 to-pink-500 shadow-md shadow-cyan-500/50'
+                  ? 'w-7 bg-gradient-to-r from-cyan-400 to-blue-500 shadow-md shadow-cyan-500/50'
                   : 'w-2 bg-slate-600 hover:bg-slate-400'
               }`}
               title={`Slide ${idx + 1}`}

@@ -142,95 +142,96 @@ export const MyExchangesModal = ({ onClose, onOpenListTrade }) => {
   }, [onClose, activeChatTrade]);
 
   return (
-    <div
-      onClick={(e) => {
-        if (e.target === e.currentTarget && !activeChatTrade) onClose();
-      }}
-      className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/85 backdrop-blur-md p-4 sm:p-6 cursor-pointer"
-    >
-      <div className="min-h-full flex items-center justify-center py-6">
-        <div
-          onClick={(e) => e.stopPropagation()}
-          className="relative w-full max-w-4xl glass-panel rounded-3xl border border-slate-700 shadow-2xl p-6 sm:p-8 animate-in fade-in zoom-in-95 duration-200 cursor-default"
-        >
-          <button
-            onClick={onClose}
-            className="absolute top-5 right-5 p-2 rounded-full bg-slate-900 border border-slate-700 text-slate-400 hover:text-white transition-all cursor-pointer"
-            title="Close (Esc)"
+    <>
+      <div
+        onClick={(e) => {
+          if (e.target === e.currentTarget && !activeChatTrade) onClose();
+        }}
+        className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/85 backdrop-blur-md p-4 sm:p-6 cursor-pointer"
+      >
+        <div className="min-h-full flex items-center justify-center py-6">
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="relative w-full max-w-4xl glass-panel rounded-3xl border border-slate-700 shadow-2xl p-6 sm:p-8 animate-in fade-in zoom-in-95 duration-200 cursor-default"
           >
-            <X className="w-5 h-5" />
-          </button>
+            <button
+              onClick={onClose}
+              className="absolute top-5 right-5 p-2 rounded-full bg-slate-900 border border-slate-700 text-slate-400 hover:text-white transition-all cursor-pointer"
+              title="Close (Esc)"
+            >
+              <X className="w-5 h-5" />
+            </button>
 
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-800">
-          <div>
-            <div className="flex items-center gap-2 text-pink-400 text-xs font-bold uppercase tracking-wider font-['Rajdhani']">
-              <Repeat className="w-4 h-4" />
-              Community Game Barter Desk
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-800">
+            <div>
+              <div className="flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-wider font-['Rajdhani']">
+                <Repeat className="w-4 h-4" />
+                Community Game Barter Desk
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-white font-['Rajdhani']">
+                My Trade Desk
+              </h2>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-white font-['Rajdhani']">
-              My Trade Desk
-            </h2>
+
+            <button
+              onClick={() => {
+                onClose();
+                onOpenListTrade();
+              }}
+              className="btn-exchange py-2 px-4 text-xs font-bold self-start sm:self-auto cursor-pointer"
+            >
+              <PlusCircle className="w-4 h-4" />
+              + List Another Game
+            </button>
           </div>
 
-          <button
-            onClick={() => {
-              onClose();
-              onOpenListTrade();
-            }}
-            className="btn-exchange py-2 px-4 text-xs font-bold self-start sm:self-auto cursor-pointer"
-          >
-            <PlusCircle className="w-4 h-4" />
-            + List Another Game
-          </button>
-        </div>
+          {/* Tab Controls */}
+          <div className="flex items-center gap-2 overflow-x-auto my-6 border-b border-slate-800/80 pb-3">
+            <button
+              onClick={() => setActiveTab('incoming')}
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
+                activeTab === 'incoming'
+                  ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-slate-950 font-black shadow-md shadow-amber-500/20'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-900'
+              }`}
+            >
+              Incoming Offers ({incoming.filter((r) => r.status === 'Pending').length})
+            </button>
 
-        {/* Tab Controls */}
-        <div className="flex items-center gap-2 overflow-x-auto my-6 border-b border-slate-800/80 pb-3">
-          <button
-            onClick={() => setActiveTab('incoming')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all shrink-0 ${
-              activeTab === 'incoming'
-                ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-md shadow-pink-500/20'
-                : 'text-slate-400 hover:text-white hover:bg-slate-900'
-            }`}
-          >
-            Incoming Offers ({incoming.filter((r) => r.status === 'Pending').length})
-          </button>
+            <button
+              onClick={() => setActiveTab('outgoing')}
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
+                activeTab === 'outgoing'
+                  ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-slate-950 font-black shadow-md shadow-amber-500/20'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-900'
+              }`}
+            >
+              Sent Offers ({outgoing.length})
+            </button>
 
-          <button
-            onClick={() => setActiveTab('outgoing')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all shrink-0 ${
-              activeTab === 'outgoing'
-                ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-md shadow-pink-500/20'
-                : 'text-slate-400 hover:text-white hover:bg-slate-900'
-            }`}
-          >
-            Sent Offers ({outgoing.length})
-          </button>
+            <button
+              onClick={() => setActiveTab('active')}
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
+                activeTab === 'active'
+                  ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white font-black shadow-md shadow-sky-500/20'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-900'
+              }`}
+            >
+              Active Trades &amp; Shipping ({activeTrades.length})
+            </button>
 
-          <button
-            onClick={() => setActiveTab('active')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all shrink-0 ${
-              activeTab === 'active'
-                ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-slate-950 font-black shadow-md shadow-cyan-500/20'
-                : 'text-slate-400 hover:text-white hover:bg-slate-900'
-            }`}
-          >
-            Active Trades & Shipping ({activeTrades.length})
-          </button>
-
-          <button
-            onClick={() => setActiveTab('listings')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all shrink-0 ${
-              activeTab === 'listings'
-                ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-md shadow-pink-500/20'
-                : 'text-slate-400 hover:text-white hover:bg-slate-900'
-            }`}
-          >
-            My Listed Games ({myListings.length})
-          </button>
-        </div>
+            <button
+              onClick={() => setActiveTab('listings')}
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
+                activeTab === 'listings'
+                  ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-slate-950 font-black shadow-md shadow-amber-500/20'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-900'
+              }`}
+            >
+              My Listed Games ({myListings.length})
+            </button>
+          </div>
 
         {/* TAB 1: INCOMING REQUESTS */}
         {activeTab === 'incoming' && (
@@ -293,7 +294,7 @@ export const MyExchangesModal = ({ onClose, onOpenListTrade }) => {
                     </div>
 
                     <div className="space-y-1">
-                      <span className="text-[10px] uppercase font-bold text-pink-400">
+                      <span className="text-[10px] uppercase font-bold text-amber-400">
                         For Your Game:
                       </span>
                       <div className="text-sm font-bold text-white">
@@ -721,16 +722,17 @@ export const MyExchangesModal = ({ onClose, onOpenListTrade }) => {
             </div>
           </div>
         )}
-
-        {/* LIVE TRADE CHAT MODAL OVERLAY */}
-        {activeChatTrade && (
-          <TradeChatModal
-            trade={activeChatTrade}
-            onClose={() => setActiveChatTrade(null)}
-          />
-        )}
         </div>
       </div>
     </div>
-  );
+
+    {/* LIVE TRADE CHAT MODAL OVERLAY (Rendered at root to prevent transform trapping and negative scroll clipping) */}
+    {activeChatTrade && (
+      <TradeChatModal
+        trade={activeChatTrade}
+        onClose={() => setActiveChatTrade(null)}
+      />
+    )}
+  </>
+);
 };

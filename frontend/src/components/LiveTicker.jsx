@@ -15,13 +15,13 @@ export const LiveTicker = () => {
   const loop = [...TICKER_ITEMS, ...TICKER_ITEMS];
 
   return (
-    <div className="relative overflow-hidden border-b border-cyan-500/20 bg-gradient-to-r from-purple-950/40 via-slate-950 to-cyan-950/40 select-none">
+    <div className="relative overflow-hidden border-b border-slate-800 bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 select-none">
       <div className="max-w-[1600px] mx-auto flex items-center py-2 px-4 sm:px-6 lg:px-10 gap-3">
         {/* Pulsing Live Badge */}
-        <div className="flex shrink-0 items-center gap-1.5 rounded-full bg-pink-500/20 border border-pink-500/40 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-pink-300">
-          <span className="h-2 w-2 rounded-full bg-pink-500 animate-ping" />
+        <div className="flex shrink-0 items-center gap-1.5 rounded-full bg-amber-500/20 border border-amber-500/40 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-amber-300">
+          <span className="h-2 w-2 rounded-full bg-amber-400 animate-ping" />
           <span className="flex items-center gap-1 font-['Rajdhani'] font-extrabold">
-            <Flame className="w-3 h-3 text-pink-400" /> LIVE TICKER
+            <Flame className="w-3 h-3 text-amber-400" /> LIVE TICKER
           </span>
         </div>
 

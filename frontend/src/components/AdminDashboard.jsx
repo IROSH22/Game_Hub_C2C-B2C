@@ -173,7 +173,7 @@ export const AdminDashboard = ({ onClose }) => {
               <span className="text-[10px] text-slate-400 uppercase font-bold block mb-1">
                 Barter Trades
               </span>
-              <div className="text-2xl font-black text-pink-400 font-['Rajdhani']">
+              <div className="text-2xl font-black text-amber-400 font-['Rajdhani']">
                 {overview.totalExchanges}
               </div>
             </div>
@@ -297,7 +297,7 @@ export const AdminDashboard = ({ onClose }) => {
                       <span
                         className={`px-2 py-0.5 rounded text-[10px] font-bold ${
                           g.exchangeable
-                            ? 'bg-pink-500/20 text-pink-300'
+                            ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
                             : 'bg-blue-500/20 text-blue-300'
                         }`}
                       >
@@ -339,7 +339,7 @@ export const AdminDashboard = ({ onClose }) => {
                   <span className="font-bold text-white">{ex.requesterId?.name}</span> offered{' '}
                   <strong className="text-cyan-400">{ex.offeredListingId?.title}</strong> to{' '}
                   <span className="font-bold text-white">{ex.receiverId?.name}</span> for{' '}
-                  <strong className="text-pink-400">{ex.wantedListingId?.title}</strong>
+                  <strong className="text-amber-400">{ex.wantedListingId?.title}</strong>
                 </div>
                 <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-slate-800 text-slate-200">
                   {ex.status}

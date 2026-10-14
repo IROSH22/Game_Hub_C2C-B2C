@@ -694,7 +694,7 @@ export const CheckoutModal = ({ onClose, onSuccess, onOpenEmailCenter, onOpenOrd
                     }}
                     className={`p-3 rounded-2xl border text-xs font-bold transition-all cursor-pointer flex flex-col items-center justify-center gap-1.5 ${
                       paymentMethod === 'Stripe'
-                        ? 'bg-gradient-to-b from-indigo-950/80 to-purple-950/80 border-indigo-400 text-white shadow-lg shadow-indigo-500/20'
+                        ? 'bg-gradient-to-b from-slate-900 to-indigo-950/70 border-indigo-400 text-white shadow-lg shadow-indigo-500/15'
                         : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:text-white'
                     }`}
                   >
@@ -1027,7 +1027,7 @@ export const CheckoutModal = ({ onClose, onSuccess, onOpenEmailCenter, onOpenOrd
                         <button
                           type="button"
                           onClick={() => handleUseTestCard('3ds')}
-                          className="text-[10px] px-2 py-1 rounded-lg bg-slate-950 border border-slate-800 hover:border-purple-400 text-purple-300 font-mono cursor-pointer transition-all"
+                          className="text-[10px] px-2 py-1 rounded-lg bg-slate-950 border border-slate-800 hover:border-sky-400 text-sky-300 font-mono cursor-pointer transition-all"
                         >
                           🛡️ Mastercard 3DS
                         </button>

@@ -118,14 +118,14 @@ export const AuthModal = ({ onClose, onSuccess }) => {
             <button
               type="button"
               onClick={() => handleDemo('seller')}
-              className="p-2.5 rounded-xl bg-slate-950/80 hover:bg-pink-500/15 border border-pink-500/30 text-left transition-all group cursor-pointer hover:border-pink-400 hover:scale-[1.02]"
+              className="p-2.5 rounded-xl bg-slate-950/80 hover:bg-emerald-500/15 border border-emerald-500/30 text-left transition-all group cursor-pointer hover:border-emerald-400 hover:scale-[1.02]"
             >
-              <div className="text-xs font-black text-white group-hover:text-pink-300 flex items-center justify-between font-['Rajdhani']">
+              <div className="text-xs font-black text-white group-hover:text-emerald-300 flex items-center justify-between font-['Rajdhani']">
                 <span>🏪 Nexus Store</span>
-                <span className="text-[9px] px-1 rounded bg-pink-500/20 text-pink-300 font-mono">SELLER</span>
+                <span className="text-[9px] px-1 rounded bg-emerald-500/20 text-emerald-300 font-mono">SELLER</span>
               </div>
               <div className="text-[10px] text-slate-400 mt-0.5 truncate">seller@gamehub.com</div>
-              <div className="text-[10px] text-pink-400 font-bold mt-1 flex items-center gap-1">
+              <div className="text-[10px] text-emerald-400 font-bold mt-1 flex items-center gap-1">
                 <Store className="w-2.5 h-2.5" /> Verified Shop
               </div>
             </button>
@@ -169,7 +169,7 @@ export const AuthModal = ({ onClose, onSuccess }) => {
               setError('');
             }}
             className={`flex-1 py-2.5 rounded-xl transition-all cursor-pointer font-['Rajdhani'] tracking-wider ${
-              isRegister ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white font-black shadow-md' : 'text-slate-400 hover:text-white'
+              isRegister ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white font-black shadow-md' : 'text-slate-400 hover:text-white'
             }`}
           >
             REGISTER NEW ACCOUNT
@@ -266,7 +266,7 @@ export const AuthModal = ({ onClose, onSuccess }) => {
                     onClick={() => setFormData({ ...formData, role: 'seller' })}
                     className={`py-2.5 px-3 rounded-xl border font-bold text-center transition-all cursor-pointer ${
                       formData.role === 'seller'
-                        ? 'bg-pink-500/20 text-pink-400 border-pink-400 shadow-md shadow-pink-500/10'
+                        ? 'bg-amber-500/20 text-amber-300 border-amber-400 shadow-md shadow-amber-500/10'
                         : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white'
                     }`}
                   >
@@ -282,7 +282,7 @@ export const AuthModal = ({ onClose, onSuccess }) => {
                   </label>
                   <div className="relative">
                     <div className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                      <Store className="w-4 h-4 text-pink-400" />
+                      <Store className="w-4 h-4 text-amber-400" />
                     </div>
                     <input
                       type="text"
@@ -290,7 +290,7 @@ export const AuthModal = ({ onClose, onSuccess }) => {
                       value={formData.shopName}
                       onChange={(e) => setFormData({ ...formData, shopName: e.target.value })}
                       placeholder="E.g., CyberPulse Gaming Store"
-                      className="w-full h-12 pl-12 pr-4 rounded-xl bg-slate-900/95 border border-slate-700 text-white text-sm focus:border-pink-400 focus:outline-none transition-all placeholder:text-slate-500 shadow-inner"
+                      className="w-full h-12 pl-12 pr-4 rounded-xl bg-slate-900/95 border border-slate-700 text-white text-sm focus:border-amber-400 focus:outline-none transition-all placeholder:text-slate-500 shadow-inner"
                     />
                   </div>
                 </div>

@@ -77,8 +77,8 @@ export const GameCard = ({ game, onSelect, onRequestExchange }) => {
           }}
           className={`absolute top-2.5 right-2.5 p-2 rounded-xl backdrop-blur-md transition-all ${
             wishlisted
-              ? 'bg-pink-500 text-white shadow-lg shadow-pink-500/40'
-              : 'bg-slate-950/60 text-slate-300 hover:text-pink-400 border border-slate-700/60'
+              ? 'bg-rose-500 text-white shadow-lg shadow-rose-500/40'
+              : 'bg-slate-950/60 text-slate-300 hover:text-rose-400 border border-slate-700/60'
           }`}
           title={wishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
         >
