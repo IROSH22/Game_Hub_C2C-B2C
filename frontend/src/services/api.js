@@ -1,6 +1,4 @@
-// Centralized API Service
-
-const API_BASE = '/api';
+const API_BASE = (import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace(/\/$/, '') : '') + '/api';
 
 const getHeaders = (token) => {
   const headers = { 'Content-Type': 'application/json' };
@@ -177,12 +175,46 @@ export const api = {
     return res.json();
   },
 
+  getTradeMessages: async (id) => {
+    const res = await fetch(`${API_BASE}/exchanges/${id}/messages`, {
+      headers: getHeaders(),
+    });
+    return res.json();
+  },
+
+  sendTradeMessage: async (id, text) => {
+    const res = await fetch(`${API_BASE}/exchanges/${id}/message`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify({ text }),
+    });
+    return res.json();
+  },
+
   // Orders & Checkout
   createOrder: async (orderData) => {
     const res = await fetch(`${API_BASE}/orders`, {
       method: 'POST',
       headers: getHeaders(),
       body: JSON.stringify(orderData),
+    });
+    return res.json();
+  },
+
+  reviewOrder: async (id, reviewData) => {
+    const res = await fetch(`${API_BASE}/orders/${id}/review`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify(reviewData),
+    });
+    return res.json();
+  },
+
+  createStripeSession: async (items, totalAmount) => {
+    const res = await fetch(`${API_BASE}/orders/create-stripe-session`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify({ items, totalAmount }),
     });
     return res.json();
   },
@@ -256,11 +288,11 @@ export const api = {
     return res.json();
   },
 
-  testSendEmail: async (targetEmail, targetName) => {
+  testSendEmail: async (targetEmail, targetName, templateType = 'welcome') => {
     const res = await fetch(`${API_BASE}/emails/test-send`, {
       method: 'POST',
       headers: getHeaders(),
-      body: JSON.stringify({ targetEmail, targetName }),
+      body: JSON.stringify({ targetEmail, targetName, templateType }),
     });
     return res.json();
   },

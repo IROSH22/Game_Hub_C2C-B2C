@@ -11,6 +11,8 @@ import {
   Trash2,
   X,
   CheckCircle,
+  Upload,
+  Image as ImageIcon,
 } from 'lucide-react';
 import { api } from '../services/api';
 import { useAuth } from '../context/AuthContext';
@@ -59,6 +61,14 @@ export const SellerDashboard = ({ onClose }) => {
     loadSellerData();
   }, []);
 
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && !showAddModal) onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose, showAddModal]);
+
   // Quick edit stock / price
   const handleUpdateItem = async (id, stock, price, status) => {
     try {
@@ -93,22 +103,54 @@ export const SellerDashboard = ({ onClose }) => {
     }
   };
 
+  // Keyboard navigation: Escape key closes modal
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        if (showAddModal) setShowAddModal(false);
+        else onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showAddModal, onClose]);
+
+  const handleCoverFileUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setNewGame((prev) => ({ ...prev, imageUrl: event.target.result }));
+    };
+    reader.readAsDataURL(file);
+  };
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md overflow-y-auto">
-      <div className="relative w-full max-w-6xl glass-panel rounded-3xl border border-emerald-500/40 shadow-2xl p-6 sm:p-8 my-8 animate-in fade-in zoom-in-95 duration-200">
-        <button
-          onClick={onClose}
-          className="absolute top-5 right-5 p-2 rounded-full bg-slate-900 border border-slate-700 text-slate-400 hover:text-white transition-all cursor-pointer"
+    <div
+      onClick={(e) => {
+        if (e.target === e.currentTarget && !showAddModal) onClose();
+      }}
+      className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/85 backdrop-blur-md p-4 sm:p-6 cursor-pointer"
+    >
+      <div className="min-h-full flex items-center justify-center py-6">
+        <div
+          onClick={(e) => e.stopPropagation()}
+          className="relative w-full max-w-6xl glass-panel rounded-3xl border border-emerald-500/40 shadow-2xl p-6 sm:p-8 animate-in fade-in zoom-in-95 duration-200 cursor-default"
         >
-          <X className="w-5 h-5" />
-        </button>
+          <button
+            onClick={onClose}
+            className="absolute top-5 right-5 p-2 rounded-full bg-slate-900 border border-slate-700 text-slate-400 hover:text-white transition-all cursor-pointer"
+            title="Close (Esc)"
+          >
+            <X className="w-5 h-5" />
+          </button>
 
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-800">
           <div>
             <div className="flex items-center gap-2 text-emerald-400 text-xs font-bold uppercase tracking-wider font-['Rajdhani']">
               <Store className="w-4 h-4" />
-              B2C Merchant Portal
+              Official Merchant Portal
             </div>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-white font-['Rajdhani']">
               {user?.shopName || `${user?.name}'s Game Store`}
@@ -338,11 +380,20 @@ export const SellerDashboard = ({ onClose }) => {
 
         {/* MODAL: ADD PRODUCT TO STORE */}
         {showAddModal && (
-          <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-md">
-            <div className="relative w-full max-w-md glass-panel p-6 rounded-3xl border border-emerald-500/40 shadow-2xl">
+          <div
+            onClick={(e) => {
+              if (e.target === e.currentTarget) setShowAddModal(false);
+            }}
+            className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-md cursor-pointer"
+          >
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="relative w-full max-w-md glass-panel p-6 rounded-3xl border border-emerald-500/40 shadow-2xl cursor-default"
+            >
               <button
                 onClick={() => setShowAddModal(false)}
                 className="absolute top-4 right-4 text-slate-400 hover:text-white"
+                title="Close (Esc)"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -419,14 +470,44 @@ export const SellerDashboard = ({ onClose }) => {
                   </div>
                 </div>
 
-                <div>
-                  <label className="text-slate-300 block mb-1 font-bold">Cover Image URL</label>
+                {/* Cover Image Section */}
+                <div className="space-y-1.5 pt-1">
+                  <div className="flex items-center justify-between">
+                    <label className="text-slate-300 block font-bold">Game Cover Artwork</label>
+                    <label
+                      htmlFor="seller-cover-upload"
+                      className="cursor-pointer text-emerald-400 hover:text-emerald-300 text-[11px] font-bold flex items-center gap-1"
+                    >
+                      <Upload className="w-3.5 h-3.5" />
+                      <span>Upload from Device</span>
+                    </label>
+                    <input
+                      type="file"
+                      id="seller-cover-upload"
+                      accept="image/*"
+                      onChange={handleCoverFileUpload}
+                      className="hidden"
+                    />
+                  </div>
+
                   <input
                     type="url"
                     value={newGame.imageUrl}
                     onChange={(e) => setNewGame({ ...newGame, imageUrl: e.target.value })}
+                    placeholder="Paste image URL (https://...)"
                     className="w-full p-2 rounded-xl bg-slate-900 border border-slate-700 text-white text-[11px]"
                   />
+
+                  {newGame.imageUrl && (
+                    <div className="flex items-center gap-2 p-2 rounded-xl bg-slate-950 border border-slate-800">
+                      <img
+                        src={newGame.imageUrl}
+                        alt="Preview"
+                        className="w-10 h-12 object-cover rounded-lg border border-slate-700"
+                      />
+                      <span className="text-[10px] text-slate-400">Cover image ready for store catalog</span>
+                    </div>
+                  )}
                 </div>
 
                 <div>
@@ -450,6 +531,7 @@ export const SellerDashboard = ({ onClose }) => {
             </div>
           </div>
         )}
+        </div>
       </div>
     </div>
   );

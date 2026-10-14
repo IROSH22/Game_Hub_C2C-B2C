@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { api } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { TradeChatModal } from './TradeChatModal';
 
 export const MyExchangesModal = ({ onClose, onOpenListTrade }) => {
   const { user } = useAuth();
@@ -24,6 +25,9 @@ export const MyExchangesModal = ({ onClose, onOpenListTrade }) => {
   const [outgoing, setOutgoing] = useState([]);
   const [myListings, setMyListings] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // Active Trade Chat modal
+  const [activeChatTrade, setActiveChatTrade] = useState(null);
 
   // Counter-offer modal state
   const [counterTradeId, setCounterTradeId] = useState(null);
@@ -127,22 +131,42 @@ export const MyExchangesModal = ({ onClose, onOpenListTrade }) => {
     ['Accepted', 'Shipped', 'Delivered', 'Completed'].includes(t.status)
   );
 
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && !activeChatTrade) {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose, activeChatTrade]);
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md overflow-y-auto">
-      <div className="relative w-full max-w-4xl glass-panel rounded-3xl border border-slate-700 shadow-2xl p-6 sm:p-8 my-8 animate-in fade-in zoom-in-95 duration-200">
-        <button
-          onClick={onClose}
-          className="absolute top-5 right-5 p-2 rounded-full bg-slate-900 border border-slate-700 text-slate-400 hover:text-white transition-all cursor-pointer"
+    <div
+      onClick={(e) => {
+        if (e.target === e.currentTarget && !activeChatTrade) onClose();
+      }}
+      className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/85 backdrop-blur-md p-4 sm:p-6 cursor-pointer"
+    >
+      <div className="min-h-full flex items-center justify-center py-6">
+        <div
+          onClick={(e) => e.stopPropagation()}
+          className="relative w-full max-w-4xl glass-panel rounded-3xl border border-slate-700 shadow-2xl p-6 sm:p-8 animate-in fade-in zoom-in-95 duration-200 cursor-default"
         >
-          <X className="w-5 h-5" />
-        </button>
+          <button
+            onClick={onClose}
+            className="absolute top-5 right-5 p-2 rounded-full bg-slate-900 border border-slate-700 text-slate-400 hover:text-white transition-all cursor-pointer"
+            title="Close (Esc)"
+          >
+            <X className="w-5 h-5" />
+          </button>
 
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-800">
           <div>
             <div className="flex items-center gap-2 text-pink-400 text-xs font-bold uppercase tracking-wider font-['Rajdhani']">
               <Repeat className="w-4 h-4" />
-              C2C Game Barter Management
+              Community Game Barter Desk
             </div>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-white font-['Rajdhani']">
               My Trade Desk
@@ -315,6 +339,19 @@ export const MyExchangesModal = ({ onClose, onOpenListTrade }) => {
                     </div>
                   )}
 
+                  {trade.status === 'Accepted' && (
+                    <div className="pt-2 flex items-center justify-between border-t border-slate-800">
+                      <span className="text-xs text-emerald-400 font-bold">Trade Accepted &amp; Active</span>
+                      <button
+                        onClick={() => setActiveChatTrade(trade)}
+                        className="btn-primary py-2 px-3 text-xs font-bold cursor-pointer flex items-center gap-1.5 shadow-md shadow-cyan-500/20"
+                      >
+                        <MessageSquare className="w-3.5 h-3.5" />
+                        <span>Open Live Trade Chat</span>
+                      </button>
+                    </div>
+                  )}
+
                   {/* Counter Offer Field */}
                   {counterTradeId === trade._id && (
                     <div className="pt-3 border-t border-slate-800 space-y-2">
@@ -396,6 +433,19 @@ export const MyExchangesModal = ({ onClose, onOpenListTrade }) => {
                       <strong>Counter Offer Received:</strong> "{trade.counterOfferMessage}"
                     </div>
                   )}
+
+                  {trade.status === 'Accepted' && (
+                    <div className="pt-2 flex items-center justify-between border-t border-slate-800">
+                      <span className="text-xs text-emerald-400 font-bold">Proposal Accepted!</span>
+                      <button
+                        onClick={() => setActiveChatTrade(trade)}
+                        className="btn-primary py-2 px-3 text-xs font-bold cursor-pointer flex items-center gap-1.5 shadow-md shadow-cyan-500/20"
+                      >
+                        <MessageSquare className="w-3.5 h-3.5" />
+                        <span>Open Live Trade Chat</span>
+                      </button>
+                    </div>
+                  )}
                 </div>
               ))
             )}
@@ -459,6 +509,15 @@ export const MyExchangesModal = ({ onClose, onOpenListTrade }) => {
 
                     {/* Actions based on status */}
                     <div className="flex flex-wrap items-center gap-3 pt-2">
+                      {/* Live Trade Coordination Chat */}
+                      <button
+                        onClick={() => setActiveChatTrade(trade)}
+                        className="py-2 px-3.5 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/40 text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-all shadow-md shadow-cyan-500/15"
+                      >
+                        <MessageSquare className="w-4 h-4 text-cyan-400" />
+                        <span>💬 Live Trade Chat</span>
+                      </button>
+
                       {trade.status === 'Accepted' && (
                         <button
                           onClick={() => setTrackingTradeId(trade._id)}
@@ -662,6 +721,15 @@ export const MyExchangesModal = ({ onClose, onOpenListTrade }) => {
             </div>
           </div>
         )}
+
+        {/* LIVE TRADE CHAT MODAL OVERLAY */}
+        {activeChatTrade && (
+          <TradeChatModal
+            trade={activeChatTrade}
+            onClose={() => setActiveChatTrade(null)}
+          />
+        )}
+        </div>
       </div>
     </div>
   );

@@ -129,28 +129,30 @@ export const Navbar = ({
               }`}
             >
               <ShoppingBag className="w-4 h-4" />
-              Store Catalog (B2C)
+              Store Catalog
             </button>
 
-            <button
-              onClick={() => {
-                setActiveView('exchange');
-                if (onOpenExchangeHub) onOpenExchangeHub();
-              }}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
-                activeView === 'exchange'
-                  ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-md shadow-pink-500/20'
-                  : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
-              }`}
-            >
-              <Repeat className="w-4 h-4 text-pink-400" />
-              <span>Swap Zone (C2C)</span>
-              <span className="text-[9px] px-1.5 py-0.2 bg-purple-500/30 text-purple-300 rounded font-bold uppercase">
-                Barter
-              </span>
-            </button>
+            {user?.role !== 'seller' && (
+              <button
+                onClick={() => {
+                  setActiveView('exchange');
+                  if (onOpenExchangeHub) onOpenExchangeHub();
+                }}
+                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+                  activeView === 'exchange'
+                    ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-md shadow-pink-500/20'
+                    : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
+                }`}
+              >
+                <Repeat className="w-4 h-4 text-pink-400" />
+                <span>Game Swap Zone</span>
+                <span className="text-[9px] px-1.5 py-0.2 bg-purple-500/30 text-purple-300 rounded font-bold uppercase">
+                  Trade
+                </span>
+              </button>
+            )}
 
-            {user && (
+            {user && user.role !== 'seller' && (
               <button
                 onClick={onOpenMyExchanges}
                 className="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800/60 transition-all flex items-center gap-1.5 cursor-pointer"
@@ -319,16 +321,18 @@ export const Navbar = ({
                       </div>
                     </div>
 
-                    <button
-                      onClick={() => {
-                        setShowUserMenu(false);
-                        onOpenMyExchanges();
-                      }}
-                      className="w-full text-left px-3 py-2 rounded-lg text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800 flex items-center gap-2 cursor-pointer"
-                    >
-                      <Repeat className="w-4 h-4 text-pink-400" />
-                      My Exchange Requests
-                    </button>
+                    {user.role !== 'seller' && (
+                      <button
+                        onClick={() => {
+                          setShowUserMenu(false);
+                          onOpenMyExchanges();
+                        }}
+                        className="w-full text-left px-3 py-2 rounded-lg text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800 flex items-center gap-2 cursor-pointer"
+                      >
+                        <Repeat className="w-4 h-4 text-amber-400" />
+                        My Exchange Requests
+                      </button>
+                    )}
 
                     <button
                       onClick={() => {
@@ -412,19 +416,21 @@ export const Navbar = ({
               className="px-4 py-2.5 text-left rounded-xl text-xs font-bold text-slate-200 hover:bg-slate-800 flex items-center gap-2"
             >
               <ShoppingBag className="w-4 h-4 text-cyan-400" />
-              Store Catalog (B2C)
+              Store Catalog
             </button>
-            <button
-              onClick={() => {
-                setActiveView('exchange');
-                setMobileMenuOpen(false);
-              }}
-              className="px-4 py-2.5 text-left rounded-xl text-xs font-bold text-slate-200 hover:bg-slate-800 flex items-center gap-2"
-            >
-              <Repeat className="w-4 h-4 text-pink-400" />
-              Swap Zone (C2C Barter)
-            </button>
-            {user && (
+            {user?.role !== 'seller' && (
+              <button
+                onClick={() => {
+                  setActiveView('exchange');
+                  setMobileMenuOpen(false);
+                }}
+                className="px-4 py-2.5 text-left rounded-xl text-xs font-bold text-slate-200 hover:bg-slate-800 flex items-center gap-2"
+              >
+                <Repeat className="w-4 h-4 text-pink-400" />
+                Game Swap Zone
+              </button>
+            )}
+            {user && user.role !== 'seller' && (
               <button
                 onClick={() => {
                   onOpenMyExchanges();

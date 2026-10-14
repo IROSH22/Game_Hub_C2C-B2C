@@ -2,6 +2,12 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
+const dns = require('dns');
+
+// Prevent IPv6 timeout delays on external HTTPS APIs (such as EmailJS) on Windows
+if (dns.setDefaultResultOrder) {
+  dns.setDefaultResultOrder('ipv4first');
+}
 
 dotenv.config();
 
@@ -54,20 +60,35 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Start Server & Connect Database
-mongoose
-  .connect(MONGODB_URI)
-  .then(async () => {
+// Database Connection Function with Caching for Serverless / Cloud
+let isConnected = false;
+const connectDB = async () => {
+  if (isConnected || mongoose.connection.readyState === 1) {
+    return;
+  }
+  try {
+    await mongoose.connect(MONGODB_URI);
+    isConnected = true;
     console.log(`🚀 Connected to MongoDB at ${MONGODB_URI}`);
     await seedDatabase();
+  } catch (err) {
+    console.error('❌ MongoDB Connection Error:', err.message);
+  }
+};
+
+// Middleware to ensure DB connection on serverless requests
+app.use(async (req, res, next) => {
+  await connectDB();
+  next();
+});
+
+// Start Standalone Server if run directly
+if (require.main === module) {
+  connectDB().then(() => {
     app.listen(PORT, () => {
       console.log(`🎮 Game Hub Backend API listening on http://localhost:${PORT}`);
     });
-  })
-  .catch((err) => {
-    console.error('❌ MongoDB Connection Error:', err.message);
-    // Still listen so health and fallback work
-    app.listen(PORT, () => {
-      console.log(`⚠️ Server running without database on http://localhost:${PORT}`);
-    });
   });
+}
+
+module.exports = app;

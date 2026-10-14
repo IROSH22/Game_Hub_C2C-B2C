@@ -63,21 +63,38 @@ export const ExchangeRequestModal = ({ targetGame, onClose, onSuccess, onOpenLis
     setSubmitting(false);
   };
 
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
   const selectedOfferedGame = myListings.find((g) => g._id === selectedListingId);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md overflow-y-auto">
-      <div className="relative w-full max-w-xl glass-panel rounded-3xl border border-pink-500/40 shadow-2xl p-6 sm:p-8 my-8 animate-in fade-in zoom-in-95 duration-200">
-        <button
-          onClick={onClose}
-          className="absolute top-5 right-5 p-2 rounded-full bg-slate-900 border border-slate-700 text-slate-400 hover:text-white transition-all cursor-pointer"
+    <div
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+      className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/85 backdrop-blur-md p-4 sm:p-6 cursor-pointer"
+    >
+      <div className="min-h-full flex items-center justify-center py-6">
+        <div
+          onClick={(e) => e.stopPropagation()}
+          className="relative w-full max-w-xl glass-panel rounded-3xl border border-amber-500/40 shadow-2xl p-6 sm:p-8 animate-in fade-in zoom-in-95 duration-200 cursor-default"
         >
-          <X className="w-5 h-5" />
-        </button>
+          <button
+            onClick={onClose}
+            className="absolute top-5 right-5 p-2 rounded-full bg-slate-900 border border-slate-700 text-slate-400 hover:text-white transition-all cursor-pointer"
+          >
+            <X className="w-5 h-5" />
+          </button>
 
-        <div className="flex items-center gap-2 mb-4 text-pink-400 font-bold uppercase tracking-wider text-xs font-['Rajdhani']">
-          <ArrowRightLeft className="w-4 h-4 text-pink-400" />
-          Propose C2C Game Barter
+        <div className="flex items-center gap-2 mb-4 text-amber-400 font-bold uppercase tracking-wider text-xs font-['Rajdhani']">
+          <ArrowRightLeft className="w-4 h-4 text-amber-400" />
+          Propose Game Barter Exchange
         </div>
 
         <h3 className="text-2xl font-bold text-white font-['Rajdhani'] mb-1">
@@ -87,7 +104,25 @@ export const ExchangeRequestModal = ({ targetGame, onClose, onSuccess, onOpenLis
           Owned by <strong className="text-white">{targetGame?.sellerId?.name}</strong> • Seeking: {targetGame?.wantedGames || 'Any trade'}
         </p>
 
-        {success ? (
+        {user?.role === 'seller' ? (
+          <div className="text-center py-8 space-y-4">
+            <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center mx-auto">
+              <AlertCircle className="w-7 h-7" />
+            </div>
+            <h4 className="text-lg font-bold text-white font-['Rajdhani']">
+              Feature Restricted to Customer Accounts
+            </h4>
+            <p className="text-xs text-slate-300 max-w-md mx-auto leading-relaxed">
+              As a verified Merchant / Seller, you cannot participate in game barters. Sellers can only sell inventory in the <strong>Store Catalog</strong>.
+            </p>
+            <button
+              onClick={onClose}
+              className="btn-secondary py-2.5 px-6 text-xs mx-auto cursor-pointer"
+            >
+              Close
+            </button>
+          </div>
+        ) : success ? (
           <div className="text-center py-8 space-y-3">
             <CheckCircle className="w-16 h-16 text-emerald-400 mx-auto animate-bounce" />
             <h4 className="text-xl font-bold text-white font-['Rajdhani']">
@@ -212,6 +247,7 @@ export const ExchangeRequestModal = ({ targetGame, onClose, onSuccess, onOpenLis
             </button>
           </form>
         )}
+        </div>
       </div>
     </div>
   );

@@ -33,9 +33,10 @@ export const WishlistModal = ({ onClose, onRequestExchange }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md overflow-y-auto">
-      <div className="relative w-full max-w-3xl glass-panel rounded-3xl border border-pink-500/40 shadow-2xl p-6 sm:p-8 my-8 animate-in fade-in zoom-in-95 duration-200">
-        <button
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/85 backdrop-blur-md p-4 sm:p-6">
+      <div className="min-h-full flex items-center justify-center py-6">
+        <div className="relative w-full max-w-3xl glass-panel rounded-3xl border border-pink-500/40 shadow-2xl p-6 sm:p-8 animate-in fade-in zoom-in-95 duration-200">
+          <button
           onClick={onClose}
           className="absolute top-5 right-5 p-2 rounded-full bg-slate-900 border border-slate-700 text-slate-400 hover:text-white transition-all cursor-pointer"
         >
@@ -152,6 +153,7 @@ export const WishlistModal = ({ onClose, onRequestExchange }) => {
             ))}
           </div>
         )}
+        </div>
       </div>
     </div>
   );

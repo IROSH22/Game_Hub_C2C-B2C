@@ -75,8 +75,8 @@ const orderSchema = new mongoose.Schema(
     },
     paymentMethod: {
       type: String,
-      enum: ['Credit Card', 'PayPal', 'Cash on Delivery'],
-      default: 'Credit Card',
+      enum: ['Credit Card', 'Stripe', 'PayPal', 'Cash on Delivery'],
+      default: 'Stripe',
     },
     paymentStatus: {
       type: String,
@@ -107,6 +107,10 @@ const orderSchema = new mongoose.Schema(
     securityCheck: {
       type: Boolean,
       default: true,
+    },
+    isReviewed: {
+      type: Boolean,
+      default: false,
     },
     ipAddress: {
       type: String,

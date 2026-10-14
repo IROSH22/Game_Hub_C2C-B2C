@@ -29,7 +29,7 @@ export const Footer = () => {
               </span>
             </div>
             <p className="text-slate-400 leading-relaxed text-[11px]">
-              The First Hybrid E-Commerce and C2C Video Game Barter Marketplace in Sri Lanka. Buy authentic physical discs or barter game-for-game with zero fees.
+              The First Hybrid E-Commerce and Video Game Barter Marketplace in Sri Lanka. Buy authentic physical discs or barter game-for-game with zero fees.
             </p>
             <div className="text-[11px] text-emerald-400 font-semibold flex items-center gap-1">
               <ShieldCheck className="w-3.5 h-3.5" /> 100% Escrow Protected &amp; Verified
@@ -78,7 +78,7 @@ export const Footer = () => {
                 <div>
                   <div className="text-white font-bold font-['Rajdhani'] tracking-wide">100% SAFE ESCROW TRADING</div>
                   <p className="text-slate-400 text-[10px] mt-0.5 leading-relaxed">
-                    Zero-risk C2C barter. Both game discs are inspected and verified before transfer completes.
+                    Zero-risk game barter. Both game discs are inspected and verified before transfer completes.
                   </p>
                 </div>
               </div>

@@ -8,67 +8,79 @@
 [![Tailwind CSS](https://img.shields.io/badge/TailwindCSS-v3-38B2AC?logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 [![Security](https://img.shields.io/badge/Security-Anti--Tamper%20Shield-ef4444?logo=shield&logoColor=white)](#-security-shield--anti-tamper-protection)
 [![EmailJS](https://img.shields.io/badge/EmailJS-Real%20Email%20Live-f59e0b?logo=mail.ru&logoColor=white)](https://www.emailjs.com/)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 ---
 
 ## 📌 Executive Summary
-**Game Hub** is a state-of-the-art hybrid gaming commerce ecosystem engineered to unite two distinct business models on a unified glassmorphic platform:
-1. **B2C (Business-to-Consumer) Retail Store**: Certified merchants and storefronts list authentic physical video games with real-time inventory management, promo codes, multi-method payment processing, and courier tracking.
-2. **C2C (Consumer-to-Consumer) Swap Zone**: Everyday gamers barter finished physical games directly with fellow gamers (game-for-game) with **zero commission fees**, backed by a community trust engine and escrow protection.
+
+**Game Hub** is a full-featured hybrid video games commerce and barter platform tailored for the modern gaming community in Sri Lanka. It bridges the gap between commercial game retailers and peer-to-peer gamer communities on a unified, high-performance platform:
+
+1. **Official Games Store**: Certified video game merchants and retail storefronts list authentic physical disc releases (PlayStation 5, Xbox Series X, Nintendo Switch, PC) with live inventory control, sales analytics, and courier delivery.
+2. **Game Swap Zone (Community Barter Hub)**: Everyday gamers trade completed games directly with fellow gamers (game-for-game) for **$0 cash with zero platform fees**, protected by community **Trust Scores**, real-time trade messaging, and delivery tracking.
+3. **Unified Catalog & Segmented Navigation**: Clear separation between purchase-only titles and barter-only listings, alongside an **All Video Games** view with visual availability badges.
 
 ---
 
-## ⚡ Core Features & Capabilities
+## ⚡ Key Highlights & Features
 
-### 🛍️ 1. B2C E-Commerce Retail Store
-- **Dynamic Catalog Explorer**: Search, filter, and sort video games across platforms (**PlayStation 5, PlayStation 4, Xbox Series X|S, Nintendo Switch, PC**), genres, price bands, and condition (Brand New vs Pre-Owned).
-- **Persistent Shopping Cart**: Real-time stock validation, automated promo code discounts (`GAMER10` for 10% OFF), dynamic island-wide shipping calculations, and order persistence.
-- **Multi-Method Secure Checkout**: Interactive virtual 3D card entry, PayPal simulation, and Cash on Delivery (COD) with immediate receipt generation.
-- **Seller Merchant Dashboard**:
-  - Live inventory tracking (Add, Edit, Delete, Restock, Mark Sold).
-  - Revenue analytics and sales volume metrics.
-  - Order fulfillment management (Confirm -> Processing -> Shipped -> Delivered).
+### 🛍️ 1. Official Games Store (Direct Purchase)
+- **Multi-Platform Hardware Support**: PS5, PS4, Xbox Series X|S, Nintendo Switch, PC Steam/Windows.
+- **Selective Cart Purchasing**: Checkbox item selection allows gamers to select specific games to purchase immediately while saving other items in the cart for later.
+- **Smart Promo Discounts**: Automatic discount coupon engine (e.g. `GAMER10` for 10% OFF).
+- **Saved Cards Vault**: Add, view, mask (PCI-DSS compliant), and remove saved credit/debit cards with instant card network detection (Visa, Mastercard, Amex).
+- **Real Payment Gateways & Zero Auto-Success**:
+  - **Stripe**: Interactive 3D Secure (3DS) authentication challenge flow with risk assessment and challenge verification.
+  - **PayPal**: Official PayPal SDK flow with simulated sandbox redirection.
+  - **Cash on Delivery (COD)**: Verified island-wide courier fulfillment.
+- **Live Merchant Reviews & Ratings**: Customers can rate sellers (1-5 stars) and write verified reviews after receiving their orders.
 
-### 🔄 2. C2C Barter & Game Swap Engine
-- **Direct Peer-to-Peer Trades**: Gamers list games from their personal library specifying condition, photos, city location, and the desired title they want in exchange.
-- **Barter Proposal Workflow**:
-  - Trader submits an exchange offer selecting their game and attaching a personalized negotiation note.
-  - Game Owner reviews incoming offers with full proposer details and accepts or declines in real-time.
-  - Status progression: `Proposed` ➔ `Accepted` ➔ `In Escrow` ➔ `Shipped` ➔ `Completed`.
-- **Smart Wishlist Matching Engine**: Matches gamer wishlists with available barter inventory automatically.
-- **Trust & Escrow Verification**: Trader reputation score dynamically computed from completed exchanges and positive ratings.
+### 🔄 2. Community Game Swap Zone (Barter Desk)
+- **Zero Cash Barter**: Barter listings do not require a price (`$0.00`) — trades are 100% game-for-game exchanges.
+- **Custom Artwork & Cover Upload**: Gamers can upload custom cover images directly from their device (with instant preview) or enter an external image URL.
+- **Gamer-to-Gamer Trade Requests**: Propose a game from your inventory with a personal trade pitch.
+- **Live Trade Chat & Messenger**:
+  - Once a barter proposal is accepted, an integrated real-time chat unlocks between the two traders.
+  - Negotiate meeting locations, courier drop-offs, and swap tracking.
+  - Seamless navigation with explicit "Back to Trades" button, backdrop click dismiss, and `ESC` key dismiss.
+- **Community Trust Scores**: Dynamic reputation score (0-100%) calculated from successful trades and verified trader ratings.
 
-### 📧 3. Automated Transactional Email System (EmailJS Live Delivery)
-- Full integration with **[EmailJS](https://www.emailjs.com)** REST API dispatching authentic emails to real inboxes:
-  - **Item Listed Confirmation**: Emailed when a game is published to the store or exchange hub.
-  - **Order Confirmation & Invoices**: Detailed HTML order receipts sent instantly upon checkout.
-  - **Fulfillment Status Updates**: Dispatched when merchant updates delivery status to *Shipped* or *Delivered*.
-  - **Barter Offers & Acceptances**: Real-time notifications for trade proposals and accepted barter deals.
-- **In-App Dispatched Notification Modal**: View live logs of all sent emails and test real delivery to any personal email address.
+### 🛡️ 3. Seller Isolation & Merchant Safeguards
+- **Role-Based Isolation**: Verified merchants (role: `seller`) are dedicated purely to store inventory.
+- **Exchange Section Quarantined**: Sellers never see the Swap Zone tab, trade banners, or barter buttons anywhere in the navigation bar, hero slider, catalog, or game detail modals.
+- **Dedicated Merchant Desk**:
+  - Inventory CRUD (Add, Edit stock/price, Delete, Restock).
+  - Sales analytics, order fulfillment status updates, and revenue metrics.
+  - Custom game cover artwork upload with live card preview.
 
-### 🛡️ 4. Security Shield & Anti-Tamper Protection
-- **Developer Mode & DevTools Lockdown**:
-  - Restricts keyboard developer shortcuts (`F12`, `Ctrl+Shift+I`, `Ctrl+Shift+J`, `Ctrl+Shift+C`, `Ctrl+U`, `Ctrl+S`).
-  - Blocks right-click context menu (`Inspect Element`) across the entire web application.
-  - Neutralizes `window.__REACT_DEVTOOLS_GLOBAL_HOOK__` to prevent third-party inspection of component state and hooks.
-  - Detects active DevTools window docking and clears console with high-priority security warnings.
-- **Payment Gateway Hardening & PCI-DSS Compliance**:
-  - **Server-Side Price Integrity**: All prices, quantities, and totals are strictly calculated and validated on the backend against database records — client-side price tampering is impossible.
-  - **Cryptographic HMAC-SHA256 Signatures**: Each transaction is signed using HMAC-SHA256 tokens (`/api/orders/:id/verify-signature`) ensuring tamper-proof audit trails.
-  - **PCI-DSS Card Sanitization**: Raw card data and CVV are never stored in the database; only sanitized masked last-4 digits are retained.
-  - **Anti-Spam Rate Limiting**: Intelligent sliding window rate limiters prevent card brute-force attacks and bot spam checkouts.
+### 📧 4. Transactional Email System (EmailJS Integration)
+- Dispatches transactional emails to genuine inboxes via the EmailJS REST API:
+  - **Item Listed Notifications**: Sent when games are published.
+  - **Order Confirmation & Itemized Receipts**: Dispatched instantly upon checkout.
+  - **Order Status Updates**: Dispatched when merchants update status (*Shipped*, *Delivered*).
+  - **Barter Offer Alerts**: Dispatched when an exchange is proposed or accepted.
+- **In-App Email Center**: Inspect generated HTML templates, view delivery status logs, and test sending to any email address.
+
+### 🎨 5. Professional Obsidian & Sapphire Gaming Theme
+- Replaced cheap, neon-purple "AI glow" palettes with a sleek, mature gaming aesthetic inspired by Steam, PlayStation Store, and Epic Games:
+  - **Backdrop**: Deep midnight obsidian (`#07090e`, `#0d121c`).
+  - **Store Buy Accent**: Electric Sapphire & High-Tech Sky Blue (`#0284c7`, `#2563eb`).
+  - **Barter Trade Accent**: Warm Amber Gold & Sunset Bronze (`#f59e0b`, `#d97706`).
+  - **Trust & Merchant Badges**: Clean Emerald (`#10b981`).
+  - **Typography**: High-legibility Rajdhani headers and Inter body text.
 
 ---
 
-## 🏗️ Architectural Overview
+## 🏗️ System Architecture
 
 ```
                                   ┌───────────────────────────────┐
                                   │       Client Browser          │
                                   │   React 19 + Tailwind CSS     │
+                                  │   Vite 8.2 • Lucide Icons     │
                                   └──────────────┬────────────────┘
                                                  │
-                             REST API (JSON)     │ JWT Auth / Bearer Token
+                             REST API (JSON)     │ JWT Bearer Token / Auth
                                                  ▼
                                   ┌───────────────────────────────┐
                                   │     Node.js / Express API     │
@@ -79,7 +91,7 @@
                                           ▼               ▼
                      ┌────────────────────────┐       ┌──────────────────────┐
                      │    MongoDB Database    │       │     EmailJS Cloud    │
-                     │  (Local / Atlas Cloud) │       │   Real Email Sender  │
+                     │  (Local / Atlas Cloud) │       │   Live Email Delivery│
                      └────────────────────────┘       └──────────────────────┘
 ```
 
@@ -89,61 +101,59 @@
 
 | Layer | Technologies |
 | :--- | :--- |
-| **Frontend** | React 19, Vite 8.2, Tailwind CSS 3, Lucide React Icons, Canvas Confetti |
-| **Backend** | Node.js 18+, Express.js 4, Mongoose 8, JWT (JSON Web Tokens), Bcrypt.js, Crypto (HMAC-SHA256) |
-| **Database** | MongoDB (Local MongoDB Community Server or MongoDB Atlas M0 Free Cluster) |
-| **Email Delivery** | EmailJS REST API (`https://api.emailjs.com/api/v1.0/email/send`) + SMTP Fallback |
-| **Security** | Anti-Tamper Security Shield, Rate Limiting, PCI-DSS Sanitization, HMAC-SHA256 Signatures |
+| **Frontend Framework** | React 19, Vite 8.2, Tailwind CSS 3 |
+| **Icons & Effects** | Lucide React, Canvas Confetti |
+| **Backend Framework** | Node.js 18+, Express.js 4 |
+| **Database & ODM** | MongoDB, Mongoose 8 |
+| **Security & Auth** | JSON Web Tokens (JWT), Bcrypt.js, HMAC-SHA256 Signatures, PCI-DSS Sanitization |
+| **Payment Gateways** | Stripe 3DS Verification Flow, PayPal SDK Sandbox, Cash on Delivery (COD) |
+| **Transactional Email** | EmailJS REST API (`https://api.emailjs.com/api/v1.0/email/send`) |
 
 ---
 
-## 🚀 Getting Started & Installation
+## 🚀 Getting Started
 
 ### 1. Prerequisites
 - **Node.js** v18.0.0 or higher ([Download Node.js](https://nodejs.org/))
-- **MongoDB** Community Server running locally OR a free **MongoDB Atlas** Cloud Cluster URI ([MongoDB Atlas](https://www.mongodb.com/atlas))
+- **MongoDB** running locally (`mongodb://127.0.0.1:27017/gamehub`) or a free [MongoDB Atlas Cluster](https://www.mongodb.com/atlas).
 
 ---
 
-### 2. Clone Repository
+### 2. Clone the Repository
 ```bash
-git clone https://github.com/your-username/game-hub.git
-cd game-hub
+git clone https://github.com/IROSH22/Game_Hub_C2C-B2C.git
+cd game-hub-main
 ```
 
 ---
 
-### 3. Backend Configuration & Setup
-1. Navigate to the backend directory:
+### 3. Backend Setup
+1. Open a terminal and enter the backend directory:
    ```bash
    cd backend
    npm install
    ```
-2. Create your `.env` configuration file from the template:
-   ```bash
-   cp .env.example .env
-   ```
-3. Configure your variables in `backend/.env`:
+2. Create your `.env` file (copy from `.env.example` if available):
    ```env
    PORT=5000
    MONGODB_URI=mongodb://127.0.0.1:27017/gamehub
    JWT_SECRET=your_super_secret_jwt_key_here_gamehub_secure_vault
 
-   # Optional: EmailJS credentials for live email delivery (https://www.emailjs.com)
-   EMAILJS_SERVICE_ID=your_service_id
-   EMAILJS_TEMPLATE_ID=your_template_id
-   EMAILJS_PUBLIC_KEY=your_public_key
+   # EmailJS Configuration (Optional for live email delivery)
+   EMAILJS_SERVICE_ID=your_emailjs_service_id
+   EMAILJS_TEMPLATE_ID=your_emailjs_template_id
+   EMAILJS_PUBLIC_KEY=your_emailjs_public_key
    ```
-4. Start the backend server:
+3. Start the backend server:
    ```bash
-   npm start
+   node server.js
    ```
-   *The backend will initialize and listen on `http://localhost:5000`.*
+   *The server will initialize and listen on `http://localhost:5000`.*
 
 ---
 
 ### 4. Frontend Setup
-1. Open a new terminal and navigate to the frontend directory:
+1. In a separate terminal, enter the frontend directory:
    ```bash
    cd frontend
    npm install
@@ -156,77 +166,69 @@ cd game-hub
 
 ---
 
-### ⚡ Quick Launch (Windows Users)
-You can launch both the backend and frontend simultaneously with a single double-click using the included root batch script:
-```bash
-start-all.bat
-```
+### ⚡ One-Click Windows Launch
+Double-click `start-all.bat` in the root folder to start both backend and frontend servers simultaneously.
 
 ---
 
-## 🔑 Pre-Configured Demo Accounts (1-Click Login)
-For evaluation and testing, the application includes 1-click test credentials inside the Login Modal:
+## 🔑 Demo Accounts (1-Click Login)
 
-| Role | Email Address | Password | Permissions & Scope |
+The login modal contains 1-click test credentials for instant evaluation:
+
+| Account Type | Email | Password | Role & Scope |
 | :--- | :--- | :--- | :--- |
-| **Customer / Gamer** | `gamer@gamehub.com` | `password123` | Store Buyer, Cart, Checkout, C2C Barter Trader, Wishlist |
-| **Trader 2** | `gamer2@gamehub.com` | `password123` | Second Peer Gamer for simulating C2C barter exchanges |
-| **Merchant Seller** | `seller@gamehub.com` | `password123` | B2C Merchant Dashboard, Inventory CRUD, Order Management |
-| **System Administrator** | `admin@gamehub.com` | `password123` | System Overview, User Management, Full Platform Moderation |
+| **Gamer 1** | `gamer@gamehub.com` | `password123` | Store Buyer, Cart, Checkout, C2C Barter Trader, Wishlist, Trade Chat |
+| **Gamer 2** | `gamer2@gamehub.com` | `password123` | Second peer gamer for testing barter proposals and live trade chat |
+| **Merchant Seller** | `seller@gamehub.com` | `password123` | B2C Merchant Dashboard, Inventory CRUD, Order Management, Customer Reviews |
+| **Administrator** | `admin@gamehub.com` | `password123` | Full system moderation, user access control, catalog oversight |
 
 ---
 
-## 📡 Core REST API Endpoints
+## 📡 REST API Reference
 
 ### 🔐 Authentication (`/api/auth`)
 - `POST /api/auth/register` — Register a new gamer or merchant account
-- `POST /api/auth/login` — Authenticate and receive signed JWT token
-- `GET /api/auth/profile` — Fetch authenticated user profile and stats
+- `POST /api/auth/login` — Sign in and receive signed JWT
+- `GET /api/auth/profile` — Fetch user profile, trust score, and trade history
 
 ### 🎮 Game Catalog & Inventory (`/api/games`)
-- `GET /api/games` — Fetch listings with search, platform, genre, and type filters
-- `GET /api/games/:id` — Get detailed game profile and seller information
-- `POST /api/games` — Create a new B2C product or C2C barter listing
-- `PUT /api/games/:id` — Update listing price, condition, or stock
-- `DELETE /api/games/:id` — Remove listing from marketplace
+- `GET /api/games?listingType=buy|trade|all` — Fetch catalog with platform, genre, and listing type filters
+- `GET /api/games/:id` — Get detailed game profile and merchant information
+- `POST /api/games` — Add game to store or exchange hub
+- `PUT /api/games/:id` — Update listing details, stock, or price
+- `DELETE /api/games/:id` — Remove game listing
 
 ### 📦 Orders & Payments (`/api/orders`)
-- `POST /api/orders` — Secure checkout, server-side price calculation & HMAC signature creation
-- `GET /api/orders/my-orders` — Get authenticated customer's order history
-- `GET /api/orders/seller` — Get merchant's customer orders
-- `PUT /api/orders/:id/status` — Update order fulfillment status (Shipped, Delivered)
-- `GET /api/orders/:id/verify-signature` — Verify cryptographic HMAC-SHA256 payment signature
+- `POST /api/orders` — Server-validated checkout, calculates totals and issues cryptographic HMAC signatures
+- `GET /api/orders/my-orders` — Customer's purchase history and courier tracking
+- `GET /api/orders/seller` — Merchant's incoming customer orders
+- `PUT /api/orders/:id/status` — Update order fulfillment (`Shipped`, `Delivered`)
+- `POST /api/orders/:id/rate` — Submit merchant rating and review after delivery
 
-### 🔄 C2C Barter & Exchange (`/api/exchanges`)
-- `GET /api/exchanges` — Get user's incoming and outgoing barter proposals
-- `POST /api/exchanges` — Propose a game barter offer
-- `PUT /api/exchanges/:id/status` — Accept, decline, or update shipping status of barter deal
+### 🔄 Barter & Trade Hub (`/api/exchanges`)
+- `GET /api/exchanges` — Fetch user's incoming and outgoing barter proposals
+- `POST /api/exchanges` — Send a game-for-game barter proposal
+- `PUT /api/exchanges/:id/status` — Accept or decline a barter proposal
+- `GET /api/exchanges/:id/messages` — Fetch trade chat message history
+- `POST /api/exchanges/:id/messages` — Send message in trade chat
+- `POST /api/exchanges/:id/rate` — Submit peer trader rating and review after trade completion
 
 ### 📧 Email Center (`/api/emails`)
-- `GET /api/emails/logs` — Fetch dispatched email logs and status
-- `POST /api/emails/test-send` — Send live test email to any verified inbox via EmailJS
+- `GET /api/emails/logs` — View all dispatched transactional email logs
+- `POST /api/emails/test-send` — Send a test email to any verified recipient address
 
 ---
 
-## 🛡️ Security Verification
-To verify payment authenticity and zero-tampering for any order:
-```http
-GET /api/orders/:orderId/verify-signature
-Authorization: Bearer <your_jwt_token>
-```
-Response:
-```json
-{
-  "success": true,
-  "transactionId": "TXN-17918882-5421",
-  "amount": 79.99,
-  "isAuthentic": true,
-  "riskScore": "Low Risk (Score: 0.01 - 3D Secure Verified)",
-  "tamperAudit": "SECURE: Transaction has valid cryptographic signature. Zero tampering detected."
-}
-```
+## 🌐 Cloud & Vercel Deployment Guide
+
+To deploy **Game Hub** to Vercel:
+
+1. **Database**: Create a free MongoDB Atlas cluster and obtain the connection string (`mongodb+srv://<user>:<password>@cluster0.mongodb.net/gamehub`).
+2. **Backend**: Deploy the `backend/` folder to Render, Railway, or Vercel Serverless Functions. Set `MONGODB_URI` and `JWT_SECRET` in environment variables.
+3. **Frontend**: Deploy `frontend/` to Vercel. Set `VITE_API_URL` to your production backend URL (e.g. `https://gamehub-api.onrender.com`).
+4. **Build Command**: `npm run build` with output directory `dist`.
 
 ---
 
 ## 📄 License
-This project is licensed under the **MIT License**. Feel free to use, modify, and distribute for personal or academic purposes.
+This project is licensed under the **MIT License**. Free for personal, educational, and commercial use.

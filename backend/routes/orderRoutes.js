@@ -4,6 +4,7 @@ const Order = require('../models/Order');
 const GameListing = require('../models/GameListing');
 const Notification = require('../models/Notification');
 const User = require('../models/User');
+const Review = require('../models/Review');
 const { authMiddleware } = require('../middleware/auth');
 const { sendEmailNotification } = require('../utils/mailer');
 
@@ -44,10 +45,10 @@ router.post('/', authMiddleware, async (req, res) => {
     }
 
     // Whitelist allowed payment methods
-    const allowedPaymentMethods = ['Credit Card', 'PayPal', 'Cash on Delivery'];
+    const allowedPaymentMethods = ['Credit Card', 'Stripe', 'PayPal', 'Cash on Delivery'];
     const sanitizedPaymentMethod = allowedPaymentMethods.includes(paymentMethod)
       ? paymentMethod
-      : 'Credit Card';
+      : 'Stripe';
 
     let subtotal = 0;
     const verifiedItems = [];
@@ -113,7 +114,10 @@ router.post('/', authMiddleware, async (req, res) => {
 
     const shippingFee = subtotal > 60 ? 0 : 4.99; // Free shipping over $60
     const totalAmount = Number((subtotal - discountAmount + shippingFee).toFixed(2));
-    const transactionId = `TXN-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
+    const transactionId =
+      req.body.transactionId && String(req.body.transactionId).trim().length > 4
+        ? String(req.body.transactionId).trim()
+        : `TXN-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
 
     // Sanitize Card digits (PCI-DSS compliance: never save CVV or raw PAN)
     const sanitizedCardLast4 = String(cardLast4 || '4242').replace(/\D/g, '').slice(-4) || '4242';
@@ -315,6 +319,127 @@ router.get('/:id/verify-signature', authMiddleware, async (req, res) => {
     });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Payment signature audit failed.' });
+  }
+});
+
+// 6. Create Stripe Official Hosted Checkout Session
+router.post('/create-stripe-session', authMiddleware, async (req, res) => {
+  try {
+    const stripeKey = process.env.STRIPE_SECRET_KEY;
+    if (!stripeKey) {
+      return res.status(400).json({
+        success: false,
+        isConfigured: false,
+        message: 'STRIPE_SECRET_KEY not set in backend/.env. Using client-side 3D Secure SCA terminal.',
+      });
+    }
+
+    const stripe = require('stripe')(stripeKey);
+    const { items, totalAmount } = req.body;
+
+    const line_items = (items || []).map((item) => ({
+      price_data: {
+        currency: 'usd',
+        product_data: {
+          name: item.title,
+          description: `${item.platform} • ${item.condition || 'Tested Physical Disc'}`,
+        },
+        unit_amount: Math.round(Number(item.price) * 100),
+      },
+      quantity: item.quantity || 1,
+    }));
+
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: line_items.length > 0 ? line_items : [{
+        price_data: {
+          currency: 'usd',
+          product_data: { name: 'Game Hub Video Game Order' },
+          unit_amount: Math.round(Number(totalAmount || 59.99) * 100),
+        },
+        quantity: 1,
+      }],
+      mode: 'payment',
+      customer_email: req.user.email,
+      success_url: `http://localhost:5173/?stripe_success=true&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `http://localhost:5173/?stripe_cancel=true`,
+    });
+
+    res.json({ success: true, url: session.url, sessionId: session.id });
+  } catch (err) {
+    console.error('Stripe session creation error:', err);
+    res.status(500).json({ success: false, message: 'Stripe error: ' + err.message });
+  }
+});
+
+// 7. Rate & Review Seller for an Order
+router.post('/:id/review', authMiddleware, async (req, res) => {
+  try {
+    const { rating, comment, sellerId } = req.body;
+    const order = await Order.findById(req.params.id);
+
+    if (!order) {
+      return res.status(404).json({ success: false, message: 'Order not found.' });
+    }
+
+    if (order.userId.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ success: false, message: 'Unauthorized to review this order.' });
+    }
+
+    if (order.isReviewed) {
+      return res.status(400).json({ success: false, message: 'You have already reviewed this order!' });
+    }
+
+    const targetSellerId = sellerId || order.items[0]?.sellerId;
+    if (!targetSellerId) {
+      return res.status(400).json({ success: false, message: 'No seller associated with this order to review.' });
+    }
+
+    const numRating = Number(rating);
+    if (!numRating || numRating < 1 || numRating > 5) {
+      return res.status(400).json({ success: false, message: 'Rating must be between 1 and 5 stars.' });
+    }
+
+    const newReview = await Review.create({
+      reviewerId: req.user._id,
+      revieweeId: targetSellerId,
+      orderId: order._id,
+      listingId: order.items[0]?.listingId,
+      rating: numRating,
+      comment: comment || 'Verified purchase review.',
+      type: 'purchase',
+    });
+
+    order.isReviewed = true;
+    await order.save();
+
+    // Recalculate target seller's trust score & stats
+    const allUserReviews = await Review.find({ revieweeId: targetSellerId });
+    const avgScore = allUserReviews.reduce((sum, r) => sum + r.rating, 0) / allUserReviews.length;
+    const trustPercent = Math.min(100, Math.round((avgScore / 5) * 100));
+
+    await User.findByIdAndUpdate(targetSellerId, {
+      trustScore: trustPercent,
+      totalRatings: allUserReviews.length,
+      averageRating: Number(avgScore.toFixed(1)),
+    });
+
+    // Notify the seller
+    await Notification.create({
+      userId: targetSellerId,
+      title: '🌟 New Verified Store Review!',
+      message: `${req.user.name} rated your service ${numRating} stars on Order #${order._id.toString().slice(-6)}! Your Trust Score is now ${trustPercent}%.`,
+      type: 'review_received',
+    });
+
+    res.status(201).json({
+      success: true,
+      message: 'Review submitted successfully! Thank you for rating the merchant.',
+      review: newReview,
+    });
+  } catch (err) {
+    console.error('Order review error:', err);
+    res.status(500).json({ success: false, message: 'Failed to submit review: ' + err.message });
   }
 });
 

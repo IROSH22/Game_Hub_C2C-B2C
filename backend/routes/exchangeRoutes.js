@@ -12,6 +12,10 @@ const router = express.Router();
 // 1. Get all public exchange listings (C2C games available to barter)
 router.get('/', optionalAuth, async (req, res) => {
   try {
+    if (req.user?.role === 'seller') {
+      return res.json({ success: true, count: 0, listings: [] });
+    }
+
     const { platform, genre, condition, search } = req.query;
 
     const query = {
@@ -47,6 +51,10 @@ router.get('/', optionalAuth, async (req, res) => {
 // 2. Get my own listed games for exchange
 router.get('/my-listings', authMiddleware, async (req, res) => {
   try {
+    if (req.user.role === 'seller') {
+      return res.json({ success: true, listings: [] });
+    }
+
     const listings = await GameListing.find({
       sellerId: req.user._id,
       exchangeable: true,
@@ -86,6 +94,13 @@ router.get('/my-requests', authMiddleware, async (req, res) => {
 // 4. Send an exchange request (Offer Game A for Game B)
 router.post('/request', authMiddleware, async (req, res) => {
   try {
+    if (req.user.role === 'seller') {
+      return res.status(403).json({
+        success: false,
+        message: 'Official Sellers can only sell in the Store Catalog. Game barter/exchange is exclusive to regular gamer accounts.',
+      });
+    }
+
     const { wantedListingId, offeredListingId, message } = req.body;
 
     if (!wantedListingId || !offeredListingId) {
@@ -192,6 +207,15 @@ router.put('/:id/respond', authMiddleware, async (req, res) => {
 
     if (action === 'accept') {
       trade.status = 'Accepted';
+
+      // Auto-post trade agreement welcome message in live chat
+      if (!trade.messages) trade.messages = [];
+      trade.messages.push({
+        senderId: req.user._id,
+        senderName: req.user.name,
+        text: `🤝 I have accepted your trade proposal! We can now coordinate our shipping addresses, courier details, and item condition right here in this live trade chat.`,
+        createdAt: new Date(),
+      });
 
       // Notify requester
       await Notification.create({
@@ -390,6 +414,105 @@ router.post('/:id/review', authMiddleware, async (req, res) => {
     });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Failed to submit review.' });
+  }
+});
+
+// 8. Get Trade Chat Messages
+router.get('/:id/messages', authMiddleware, async (req, res) => {
+  try {
+    const trade = await ExchangeRequest.findById(req.params.id)
+      .populate('requesterId', 'name profileImage')
+      .populate('receiverId', 'name profileImage');
+
+    if (!trade) {
+      return res.status(404).json({ success: false, message: 'Trade not found.' });
+    }
+
+    const requesterIdStr = (trade.requesterId?._id || trade.requesterId)?.toString();
+    const receiverIdStr = (trade.receiverId?._id || trade.receiverId)?.toString();
+    const currentUserIdStr = req.user._id.toString();
+
+    const isRequester = requesterIdStr === currentUserIdStr;
+    const isReceiver = receiverIdStr === currentUserIdStr;
+
+    if (!isRequester && !isReceiver && req.user.role !== 'admin') {
+      return res.status(403).json({ success: false, message: 'Unauthorized to view this trade chat.' });
+    }
+
+    res.json({
+      success: true,
+      messages: trade.messages || [],
+      tradeStatus: trade.status,
+    });
+  } catch (err) {
+    console.error('Fetch messages error:', err);
+    res.status(500).json({ success: false, message: 'Failed to fetch trade messages: ' + err.message });
+  }
+});
+
+// 9. Send a Trade Chat Message
+router.post('/:id/message', authMiddleware, async (req, res) => {
+  try {
+    const { text } = req.body;
+    if (!text || !text.trim()) {
+      return res.status(400).json({ success: false, message: 'Message cannot be empty.' });
+    }
+
+    const trade = await ExchangeRequest.findById(req.params.id)
+      .populate('requesterId', 'name email profileImage')
+      .populate('receiverId', 'name email profileImage');
+
+    if (!trade) {
+      return res.status(404).json({ success: false, message: 'Trade not found.' });
+    }
+
+    const requesterIdStr = (trade.requesterId?._id || trade.requesterId)?.toString();
+    const receiverIdStr = (trade.receiverId?._id || trade.receiverId)?.toString();
+    const currentUserIdStr = req.user._id.toString();
+
+    const isRequester = requesterIdStr === currentUserIdStr;
+    const isReceiver = receiverIdStr === currentUserIdStr;
+
+    if (!isRequester && !isReceiver && req.user.role !== 'admin') {
+      return res.status(403).json({ success: false, message: 'Unauthorized to send messages in this trade.' });
+    }
+
+    const newMsg = {
+      senderId: req.user._id,
+      senderName: req.user.name,
+      text: text.trim(),
+      createdAt: new Date(),
+    };
+
+    if (!trade.messages) trade.messages = [];
+    trade.messages.push(newMsg);
+    await trade.save();
+
+    // In-app Notification for the other party (safe lookup)
+    const recipientId = isRequester ? (trade.receiverId?._id || trade.receiverId) : (trade.requesterId?._id || trade.requesterId);
+    if (recipientId) {
+      try {
+        await Notification.create({
+          userId: recipientId,
+          title: `💬 New Message from ${req.user.name}`,
+          message: `${text.trim().slice(0, 100)}${text.length > 100 ? '...' : ''}`,
+          type: 'trade_chat',
+          link: '/exchange-dashboard',
+        });
+      } catch (notifErr) {
+        console.warn('Chat notification create warning:', notifErr.message);
+      }
+    }
+
+    res.status(201).json({
+      success: true,
+      message: 'Message sent successfully!',
+      newMessage: newMsg,
+      messages: trade.messages,
+    });
+  } catch (err) {
+    console.error('Send trade message error:', err);
+    res.status(500).json({ success: false, message: 'Failed to send message: ' + err.message });
   }
 });
 

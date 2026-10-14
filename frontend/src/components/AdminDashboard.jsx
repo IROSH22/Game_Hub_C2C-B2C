@@ -107,9 +107,10 @@ export const AdminDashboard = ({ onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md overflow-y-auto">
-      <div className="relative w-full max-w-6xl glass-panel rounded-3xl border border-amber-500/40 shadow-2xl p-6 sm:p-8 my-8 animate-in fade-in zoom-in-95 duration-200">
-        <button
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/85 backdrop-blur-md p-4 sm:p-6">
+      <div className="min-h-full flex items-center justify-center py-6">
+        <div className="relative w-full max-w-6xl glass-panel rounded-3xl border border-amber-500/40 shadow-2xl p-6 sm:p-8 animate-in fade-in zoom-in-95 duration-200">
+          <button
           onClick={onClose}
           className="absolute top-5 right-5 p-2 rounded-full bg-slate-900 border border-slate-700 text-slate-400 hover:text-white transition-all cursor-pointer"
         >
@@ -300,7 +301,7 @@ export const AdminDashboard = ({ onClose }) => {
                             : 'bg-blue-500/20 text-blue-300'
                         }`}
                       >
-                        {g.exchangeable ? 'C2C Barter' : 'B2C Store'}
+                        {g.exchangeable ? 'Swap Zone' : 'Store Catalog'}
                       </span>
                     </td>
                     <td className="p-3 font-mono font-bold">${g.price.toFixed(2)}</td>
@@ -502,6 +503,7 @@ export const AdminDashboard = ({ onClose }) => {
             </div>
           </div>
         )}
+        </div>
       </div>
     </div>
   );

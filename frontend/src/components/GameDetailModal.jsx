@@ -1,27 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, ShoppingCart, Repeat, Star, Heart, ShieldCheck, Check, Truck, ArrowRight } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 
 export const GameDetailModal = ({ game, onClose, onRequestExchange, onInstantBuy }) => {
   const { addToCart } = useCart();
-  const { toggleWishlist, isWishlisted } = useAuth();
+  const { user, toggleWishlist, isWishlisted } = useAuth();
   const [selectedImage, setSelectedImage] = useState(game?.imageUrl);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
 
   if (!game) return null;
 
   const wishlisted = isWishlisted(game._id);
+  const isPureBarter = game.exchangeable && (!game.price || Number(game.price) === 0);
+  const isBuyable = Number(game.price) > 0;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md overflow-y-auto">
-      <div className="relative w-full max-w-4xl glass-panel rounded-3xl border border-slate-700 shadow-2xl p-6 sm:p-8 my-8 animate-in fade-in zoom-in-95 duration-200">
-        {/* Close Button */}
-        <button
-          onClick={onClose}
-          className="absolute top-5 right-5 p-2 rounded-full bg-slate-900 border border-slate-700 text-slate-400 hover:text-white transition-all cursor-pointer z-10"
-        >
-          <X className="w-5 h-5" />
-        </button>
+    <div
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+      className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/80 backdrop-blur-md p-4 sm:p-6"
+    >
+      <div className="min-h-full flex items-center justify-center py-6">
+        <div className="relative w-full max-w-4xl glass-panel rounded-3xl border border-slate-700 shadow-2xl p-6 sm:p-8 animate-in fade-in zoom-in-95 duration-200">
+          {/* Close Button */}
+          <button
+            onClick={onClose}
+            className="absolute top-5 right-5 p-2 rounded-full bg-slate-900 border border-slate-700 text-slate-400 hover:text-white transition-all cursor-pointer z-10"
+          >
+            <X className="w-5 h-5" />
+          </button>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Left Media Column */}
@@ -105,12 +121,24 @@ export const GameDetailModal = ({ game, onClose, onRequestExchange, onInstantBuy
               {/* Price & Rating */}
               <div className="flex items-center justify-between my-4 pb-4 border-b border-slate-800">
                 <div>
-                  <div className="text-3xl font-black text-cyan-400 font-['Rajdhani']">
-                    ${Number(game.price).toFixed(2)}
-                  </div>
-                  {game.originalPrice > game.price && (
-                    <div className="text-xs text-slate-500 line-through">
-                      Regular: ${Number(game.originalPrice).toFixed(2)}
+                  {isPureBarter ? (
+                    <div>
+                      <div className="text-2xl font-black text-amber-400 font-['Rajdhani'] flex items-center gap-2">
+                        <Repeat className="w-6 h-6 text-amber-400" />
+                        <span>Barter Trade Listing</span>
+                      </div>
+                      <div className="text-xs text-slate-400 mt-0.5">Game-for-game direct exchange (0% cash fee)</div>
+                    </div>
+                  ) : (
+                    <div>
+                      <div className="text-3xl font-black text-sky-400 font-['Rajdhani']">
+                        ${Number(game.price).toFixed(2)}
+                      </div>
+                      {game.originalPrice > game.price && (
+                        <div className="text-xs text-slate-500 line-through">
+                          Regular: ${Number(game.originalPrice).toFixed(2)}
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -132,15 +160,15 @@ export const GameDetailModal = ({ game, onClose, onRequestExchange, onInstantBuy
 
               {/* Exchange info if exchangeable */}
               {game.exchangeable && (
-                <div className="mt-4 p-4 rounded-xl bg-pink-950/40 border border-pink-500/30">
-                  <div className="flex items-center gap-2 text-pink-400 font-bold text-xs uppercase tracking-wider mb-1">
+                <div className="mt-4 p-4 rounded-xl bg-amber-950/40 border border-amber-500/30">
+                  <div className="flex items-center gap-2 text-amber-400 font-bold text-xs uppercase tracking-wider mb-1">
                     <Repeat className="w-4 h-4" /> Barter Exchange Offer Available
                   </div>
                   <p className="text-xs text-slate-300">
                     The owner is open to exchanging this game for another game!
                   </p>
-                  <div className="mt-2 text-xs text-pink-300 bg-pink-900/30 px-3 py-1.5 rounded-lg border border-pink-500/20 font-medium">
-                    Owner's Wishlist: <strong>{game.wantedGames || 'Any equal value console game'}</strong>
+                  <div className="mt-2 text-xs text-amber-200 bg-amber-900/30 px-3 py-1.5 rounded-lg border border-amber-500/20 font-medium">
+                    Owner's Wishlist: <strong>{game.wantedGames || 'Open to all console trade offers'}</strong>
                   </div>
                 </div>
               )}
@@ -151,7 +179,7 @@ export const GameDetailModal = ({ game, onClose, onRequestExchange, onInstantBuy
                   <img
                     src={game.sellerId?.profileImage || 'https://api.dicebear.com/7.x/bottts/svg?seed=trader'}
                     alt="Seller"
-                    className="w-10 h-10 rounded-xl object-cover border border-cyan-500/40"
+                    className="w-10 h-10 rounded-xl object-cover border border-sky-500/40"
                   />
                   <div>
                     <div className="text-xs font-bold text-white">
@@ -175,29 +203,31 @@ export const GameDetailModal = ({ game, onClose, onRequestExchange, onInstantBuy
             </div>
 
             {/* Actions Bar */}
-            <div className="space-y-2 pt-2 border-t border-slate-800">
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  onClick={() => addToCart(game)}
-                  className="btn-primary py-3 text-sm cursor-pointer"
-                >
-                  <ShoppingCart className="w-4 h-4" />
-                  Add to Cart
-                </button>
+            <div className="space-y-3 pt-2 border-t border-slate-800">
+              {isBuyable && (
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    onClick={() => addToCart(game)}
+                    className="btn-primary py-3 text-sm cursor-pointer"
+                  >
+                    <ShoppingCart className="w-4 h-4" />
+                    Add to Cart
+                  </button>
 
-                <button
-                  onClick={() => onInstantBuy(game)}
-                  className="btn-secondary py-3 text-sm cursor-pointer text-center justify-center font-bold text-white bg-slate-800 hover:bg-slate-700"
-                >
-                  Buy Now
-                </button>
-              </div>
+                  <button
+                    onClick={() => onInstantBuy(game)}
+                    className="btn-secondary py-3 text-sm cursor-pointer text-center justify-center font-bold text-white bg-slate-800 hover:bg-slate-700"
+                  >
+                    Buy Now
+                  </button>
+                </div>
+              )}
 
               <div className="flex gap-2">
-                {game.exchangeable && (
+                {game.exchangeable && user?.role !== 'seller' && (
                   <button
                     onClick={() => onRequestExchange(game)}
-                    className="btn-exchange flex-1 py-3 text-sm cursor-pointer"
+                    className="btn-exchange flex-1 py-3 text-sm cursor-pointer font-bold justify-center"
                   >
                     <Repeat className="w-4 h-4" />
                     Propose Game Trade (Barter)
@@ -208,16 +238,17 @@ export const GameDetailModal = ({ game, onClose, onRequestExchange, onInstantBuy
                   onClick={() => toggleWishlist(game._id)}
                   className={`px-4 py-3 rounded-xl border text-sm font-semibold transition-all flex items-center gap-2 cursor-pointer ${
                     wishlisted
-                      ? 'bg-pink-500 text-white border-pink-400'
-                      : 'bg-slate-900 border-slate-700 text-slate-300 hover:text-pink-400'
+                      ? 'bg-amber-500 text-slate-950 font-bold border-amber-400'
+                      : 'bg-slate-900 border-slate-700 text-slate-300 hover:text-white'
                   }`}
                 >
-                  <Heart className={`w-4 h-4 ${wishlisted ? 'fill-white' : ''}`} />
+                  <Heart className={`w-4 h-4 ${wishlisted ? 'fill-slate-950' : ''}`} />
                   <span className="hidden sm:inline">{wishlisted ? 'Wishlisted' : 'Wishlist'}</span>
                 </button>
               </div>
             </div>
           </div>
+        </div>
         </div>
       </div>
     </div>

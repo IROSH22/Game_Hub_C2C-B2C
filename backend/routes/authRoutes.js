@@ -51,6 +51,23 @@ router.post('/register', async (req, res) => {
 
     const token = generateToken(user);
 
+    // Dispatch Welcome Email via EmailJS
+    try {
+      const { sendEmailNotification } = require('../utils/mailer');
+      await sendEmailNotification({
+        to: user.email,
+        toName: user.name,
+        subject: `🎉 Welcome to Game Hub, ${user.name}! Your Gamer Account is Ready`,
+        templateType: 'welcome',
+        data: {
+          user,
+          role: user.role,
+        },
+      });
+    } catch (mailErr) {
+      console.warn('Welcome email error:', mailErr.message);
+    }
+
     res.status(201).json({
       success: true,
       message: 'Account registered successfully!',

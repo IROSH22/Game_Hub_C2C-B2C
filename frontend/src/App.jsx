@@ -63,7 +63,7 @@ function MainApp() {
   const [selectedGenre, setSelectedGenre] = useState('All');
   const [selectedCondition, setSelectedCondition] = useState('All');
   const [sortBy, setSortBy] = useState('featured');
-  const [onlyExchangeable, setOnlyExchangeable] = useState(false);
+  const [listingFilter, setListingFilter] = useState('all'); // 'all' | 'buy' | 'trade'
 
   const fetchGames = async (searchOverride = null) => {
     setLoadingGames(true);
@@ -74,7 +74,7 @@ function MainApp() {
       if (selectedPlatform !== 'All') filters.platform = selectedPlatform;
       if (selectedGenre !== 'All') filters.genre = selectedGenre;
       if (selectedCondition !== 'All') filters.condition = selectedCondition;
-      if (onlyExchangeable) filters.exchangeable = 'true';
+      if (listingFilter !== 'all') filters.listingType = listingFilter;
       if (sortBy === 'price_asc') filters.sort = 'price_asc';
       if (sortBy === 'price_desc') filters.sort = 'price_desc';
       if (sortBy === 'rating') filters.sort = 'rating';
@@ -91,7 +91,14 @@ function MainApp() {
 
   useEffect(() => {
     fetchGames();
-  }, [selectedPlatform, selectedGenre, selectedCondition, sortBy, onlyExchangeable]);
+  }, [selectedPlatform, selectedGenre, selectedCondition, sortBy, listingFilter]);
+
+  useEffect(() => {
+    if (user?.role === 'seller') {
+      if (activeView === 'exchange') setActiveView('store');
+      if (listingFilter === 'trade') setListingFilter('buy');
+    }
+  }, [user, activeView, listingFilter]);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -180,7 +187,67 @@ function MainApp() {
         {activeView === 'store' && (
           <div className="max-w-[1600px] w-full mx-auto px-4 sm:px-6 lg:px-10 py-6 space-y-8" id="catalog-section">
             {/* Cyberpunk Gaming Command Console (Search & Filter Engine) */}
-            <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-cyan-500/30 shadow-2xl shadow-cyan-950/20 space-y-6">
+            <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-slate-800 shadow-2xl space-y-6">
+              {/* Primary Section Filter: All Games vs Buy Only vs Trade Only */}
+              <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-800">
+                <div className="flex flex-wrap items-center gap-2 p-1.5 bg-slate-950/80 rounded-2xl border border-slate-800 shadow-inner">
+                  {/* All Games Tab */}
+                  <button
+                    type="button"
+                    onClick={() => setListingFilter('all')}
+                    className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+                      listingFilter === 'all'
+                        ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white font-black shadow-lg shadow-sky-500/25 scale-[1.02]'
+                        : 'text-slate-400 hover:text-white hover:bg-slate-900'
+                    }`}
+                  >
+                    <Gamepad2 className="w-4 h-4" />
+                    <span className="font-['Rajdhani'] text-sm tracking-wide">ALL VIDEO GAMES</span>
+                  </button>
+
+                  {/* Buy Only Tab */}
+                  <button
+                    type="button"
+                    onClick={() => setListingFilter('buy')}
+                    className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+                      listingFilter === 'buy'
+                        ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-black shadow-lg shadow-emerald-500/25 scale-[1.02]'
+                        : 'text-slate-400 hover:text-white hover:bg-slate-900'
+                    }`}
+                  >
+                    <ShoppingBag className="w-4 h-4" />
+                    <span className="font-['Rajdhani'] text-sm tracking-wide">STORE CATALOG (BUY ONLY)</span>
+                  </button>
+
+                  {/* Trade Only Tab (Hidden for sellers) */}
+                  {user?.role !== 'seller' && (
+                    <button
+                      type="button"
+                      onClick={() => setListingFilter('trade')}
+                      className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+                        listingFilter === 'trade'
+                          ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-slate-950 font-black shadow-lg shadow-amber-500/25 scale-[1.02]'
+                          : 'text-slate-400 hover:text-white hover:bg-slate-900'
+                      }`}
+                    >
+                      <Repeat className="w-4 h-4" />
+                      <span className="font-['Rajdhani'] text-sm tracking-wide">SWAP ZONE (TRADE ONLY)</span>
+                    </button>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-2 text-xs">
+                  <span className="text-slate-400 font-medium">Currently Viewing:</span>
+                  <span className="font-bold text-sky-400 font-mono bg-sky-500/10 px-3 py-1 rounded-xl border border-sky-500/20">
+                    {listingFilter === 'all'
+                      ? `All Listings (${games.length})`
+                      : listingFilter === 'buy'
+                      ? `Buy Only (${games.length})`
+                      : `Trade Only (${games.length})`}
+                  </span>
+                </div>
+              </div>
+
               {/* Row 1: High-Contrast Search Bar & Trending Queries */}
               <div className="space-y-3">
                 <form onSubmit={handleSearchSubmit} className="relative w-full">
@@ -322,20 +389,24 @@ function MainApp() {
                   </select>
                 </div>
 
-                {/* Barter Games Only Toggle */}
+                {/* Reset Filters Action Button */}
                 <div className="flex flex-col gap-1.5 sm:self-end">
                   <button
                     type="button"
-                    onClick={() => setOnlyExchangeable(!onlyExchangeable)}
-                    className={`h-11 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer border ${
-                      onlyExchangeable
-                        ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white border-pink-400 shadow-lg shadow-pink-500/30'
-                        : 'bg-slate-900/90 text-slate-300 border-slate-700 hover:text-white hover:border-pink-500/50'
-                    }`}
+                    onClick={() => {
+                      setSearchTerm('');
+                      setSelectedPlatform('All');
+                      setSelectedGenre('All');
+                      setSelectedCondition('All');
+                      setListingFilter('all');
+                      setSortBy('featured');
+                    }}
+                    className="h-11 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer bg-slate-900 border border-slate-700 hover:border-slate-500 text-slate-300 hover:text-white"
+                    title="Reset all search queries and filters"
                   >
-                    <Repeat className={`w-4 h-4 text-pink-400 ${onlyExchangeable ? 'animate-spin' : ''}`} />
+                    <SlidersHorizontal className="w-4 h-4 text-sky-400" />
                     <span className="font-['Rajdhani'] font-black tracking-wide">
-                      {onlyExchangeable ? 'BARTER ONLY: ON' : 'SHOW BARTER ONLY'}
+                      RESET ALL FILTERS
                     </span>
                   </button>
                 </div>
@@ -394,9 +465,10 @@ function MainApp() {
                       setSelectedPlatform('All');
                       setSelectedGenre('All');
                       setSelectedCondition('All');
-                      setOnlyExchangeable(false);
+                      setListingFilter('all');
+                      setSortBy('featured');
                     }}
-                    className="btn-secondary py-2 px-4 text-xs text-cyan-400 cursor-pointer"
+                    className="btn-secondary py-2 px-4 text-xs text-sky-400 cursor-pointer"
                   >
                     Reset All Filters
                   </button>

@@ -6,7 +6,13 @@ export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState(() => {
     try {
       const saved = localStorage.getItem('gamehub_cart');
-      return saved ? JSON.parse(saved) : [];
+      if (!saved) return [];
+      const parsed = JSON.parse(saved);
+      // Ensure each item has selected initialized (default true)
+      return parsed.map((item) => ({
+        ...item,
+        selected: item.selected !== false,
+      }));
     } catch {
       return [];
     }
@@ -25,18 +31,23 @@ export const CartProvider = ({ children }) => {
 
   const addToCart = (game, quantity = 1) => {
     setCart((prev) => {
-      const existing = prev.find((item) => item.listingId === (game._id || game.listingId));
+      const targetId = game._id || game.listingId;
+      const existing = prev.find((item) => item.listingId === targetId);
       if (existing) {
         return prev.map((item) =>
-          item.listingId === (game._id || game.listingId)
-            ? { ...item, quantity: Math.min(game.stock || 99, item.quantity + quantity) }
+          item.listingId === targetId
+            ? {
+                ...item,
+                quantity: Math.min(game.stock || 99, item.quantity + quantity),
+                selected: true,
+              }
             : item
         );
       }
       return [
         ...prev,
         {
-          listingId: game._id || game.listingId,
+          listingId: targetId,
           sellerId: game.sellerId?._id || game.sellerId,
           title: game.title,
           price: game.price,
@@ -45,6 +56,7 @@ export const CartProvider = ({ children }) => {
           condition: game.condition,
           stock: game.stock || 1,
           quantity: Math.min(game.stock || 1, quantity),
+          selected: true,
         },
       ];
     });
@@ -70,10 +82,36 @@ export const CartProvider = ({ children }) => {
     );
   };
 
+  const toggleSelectItem = (listingId) => {
+    setCart((prev) =>
+      prev.map((item) =>
+        item.listingId === listingId
+          ? { ...item, selected: item.selected === false }
+          : item
+      )
+    );
+  };
+
+  const selectAllItems = (selectAll = true) => {
+    setCart((prev) => prev.map((item) => ({ ...item, selected: selectAll })));
+  };
+
   const clearCart = () => {
     setCart([]);
     setCoupon('');
     setCouponDiscount(0);
+  };
+
+  // Remove only the items that were checked/selected for purchase
+  const removePurchasedItems = () => {
+    setCart((prev) => {
+      const remaining = prev.filter((item) => item.selected === false);
+      if (remaining.length === 0) {
+        setCoupon('');
+        setCouponDiscount(0);
+      }
+      return remaining;
+    });
   };
 
   const applyCoupon = (code) => {
@@ -90,20 +128,34 @@ export const CartProvider = ({ children }) => {
     setCouponDiscount(0);
   };
 
-  const subtotal = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  // Selected items calculations
+  const selectedItems = cart.filter((item) => item.selected !== false);
+  const selectedItemsCount = selectedItems.reduce((acc, item) => acc + item.quantity, 0);
+  const allSelected = cart.length > 0 && selectedItems.length === cart.length;
+  const hasSelected = selectedItems.length > 0;
+
+  // Financial totals calculated strictly on SELECTED items
+  const subtotal = selectedItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
   const discountAmount = subtotal * couponDiscount;
-  const shippingFee = subtotal > 60 || cart.length === 0 ? 0 : 4.99;
-  const totalAmount = Math.max(0, subtotal - discountAmount + shippingFee);
+  const shippingFee = subtotal > 60 || selectedItems.length === 0 ? 0 : 4.99;
+  const totalAmount = Math.max(0, subtotal - discountAmount + (selectedItems.length > 0 ? shippingFee : 0));
   const totalItemsCount = cart.reduce((acc, item) => acc + item.quantity, 0);
 
   return (
     <CartContext.Provider
       value={{
         cart,
+        selectedItems,
+        selectedItemsCount,
+        allSelected,
+        hasSelected,
+        toggleSelectItem,
+        selectAllItems,
         addToCart,
         removeFromCart,
         updateQuantity,
         clearCart,
+        removePurchasedItems,
         applyCoupon,
         removeCoupon,
         coupon,
@@ -121,3 +173,4 @@ export const CartProvider = ({ children }) => {
 };
 
 export const useCart = () => useContext(CartContext);
+

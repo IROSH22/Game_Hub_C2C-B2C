@@ -12,6 +12,8 @@ import {
   Flame,
 } from 'lucide-react';
 
+import { useAuth } from '../context/AuthContext';
+
 const SLIDES = [
   {
     id: 1,
@@ -22,23 +24,23 @@ const SLIDES = [
     priceTag: '$69.99',
     originalPrice: '$79.99',
     platforms: ['PS5', 'Xbox Series X'],
-    badgeColor: 'from-pink-500 to-purple-600',
+    badgeColor: 'from-sky-500 to-blue-600',
     bgImage: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=1400&auto=format&fit=crop&q=80',
     primaryBtn: { text: 'Explore Game Store', action: 'store' },
     secondaryBtn: { text: 'View Swap Zone', action: 'exchange' },
   },
   {
     id: 2,
-    tag: 'REVOLUTIONARY C2C BARTER • ZERO FEES',
+    tag: 'REVOLUTIONARY GAME BARTER • ZERO FEES',
     title: 'COMMUNITY SWAP ZONE',
     subtitle: 'Trade Finished Games for Zero Cash',
     description: 'Done playing Elden Ring or God of War? Barter game-for-game directly with fellow gamers. Protected with automated Trust Scores and delivery tracking.',
     priceTag: '$0 Cash Trade',
     originalPrice: null,
     platforms: ['PS5', 'Xbox', 'PC', 'Nintendo'],
-    badgeColor: 'from-cyan-500 to-blue-600',
+    badgeColor: 'from-amber-500 to-orange-600',
     bgImage: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=1400&auto=format&fit=crop&q=80',
-    primaryBtn: { text: 'Enter Swap Zone (C2C)', action: 'exchange' },
+    primaryBtn: { text: 'Enter Game Swap Zone', action: 'exchange' },
     secondaryBtn: { text: '+ List a Game to Trade', action: 'list_trade' },
   },
   {
@@ -50,7 +52,7 @@ const SLIDES = [
     priceTag: '$59.99',
     originalPrice: '$69.99',
     platforms: ['PC', 'PS5'],
-    badgeColor: 'from-amber-500 to-orange-600',
+    badgeColor: 'from-blue-600 to-indigo-600',
     bgImage: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=1400&auto=format&fit=crop&q=80',
     primaryBtn: { text: 'Shop RPG Catalog', action: 'store' },
     secondaryBtn: { text: 'Check Wishlist Matches', action: 'wishlist' },
@@ -63,7 +65,7 @@ const SLIDES = [
     description: 'Reach thousands of passionate console and PC gamers. Complete with live inventory control, real-time sales analytics, and automated email receipts.',
     priceTag: 'Instant Merchant Payouts',
     originalPrice: null,
-    platforms: ['B2C Store Portal'],
+    platforms: ['Merchant Store Portal'],
     badgeColor: 'from-emerald-500 to-teal-600',
     bgImage: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=1400&auto=format&fit=crop&q=80',
     primaryBtn: { text: 'Launch Seller Portal', action: 'seller' },
@@ -78,6 +80,14 @@ export const HeroSlider = ({
   onOpenWishlist,
   onOpenSeller,
 }) => {
+  const { user } = useAuth();
+  const isSeller = user?.role === 'seller';
+  const slides = isSeller
+    ? SLIDES.filter((s) => s.id !== 2).map((s) =>
+        s.id === 1 ? { ...s, secondaryBtn: { text: 'Launch Seller Portal', action: 'seller' } } : s
+      )
+    : SLIDES;
+
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
@@ -85,10 +95,10 @@ export const HeroSlider = ({
   useEffect(() => {
     if (isPaused) return;
     const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % SLIDES.length);
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
     }, 5500);
     return () => clearInterval(timer);
-  }, [isPaused]);
+  }, [isPaused, slides.length]);
 
   const handleAction = (action) => {
     switch (action) {
@@ -112,10 +122,10 @@ export const HeroSlider = ({
     }
   };
 
-  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % SLIDES.length);
-  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + SLIDES.length) % SLIDES.length);
+  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % slides.length);
+  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
 
-  const slide = SLIDES[currentSlide];
+  const slide = slides[currentSlide % slides.length] || slides[0];
 
   return (
     <div

@@ -28,6 +28,7 @@ export const EmailCenterModal = ({ onClose }) => {
   // EmailJS Setup State
   const [emailJSConfig, setEmailJSConfig] = useState(getStoredEmailJSConfig());
   const [testEmail, setTestEmail] = useState(user?.email || '');
+  const [testEmailType, setTestEmailType] = useState('welcome'); // 'welcome' | 'order_receipt'
   const [testSending, setTestSending] = useState(false);
   const [testResult, setTestResult] = useState(null);
   const [configSaved, setConfigSaved] = useState(false);
@@ -53,6 +54,8 @@ export const EmailCenterModal = ({ onClose }) => {
             ...prev,
             serviceId: statusRes.emailjs.serviceId || prev.serviceId,
             templateId: statusRes.emailjs.templateId || prev.templateId,
+            templateOrder: statusRes.emailjs.templateOrder || prev.templateOrder || prev.templateId,
+            templateWelcome: statusRes.emailjs.templateWelcome || prev.templateWelcome,
             publicKey: statusRes.emailjs.publicKey || prev.publicKey,
           }));
         }
@@ -99,16 +102,20 @@ export const EmailCenterModal = ({ onClose }) => {
     setTestResult(null);
 
     try {
-      // 1. Try sending via backend endpoint
-      const res = await api.testSendEmail(testEmail, user?.name || 'Game Hub Player');
+      // 1. Try sending via backend endpoint (with chosen templateType)
+      const res = await api.testSendEmail(testEmail, user?.name || 'Game Hub Player', testEmailType);
 
       // 2. Also test client EmailJS if keys are stored in browser
       let clientMsg = '';
-      if (emailJSConfig.serviceId && emailJSConfig.templateId && emailJSConfig.publicKey) {
+      const hasTemplates = emailJSConfig.templateOrder || emailJSConfig.templateWelcome || emailJSConfig.templateId;
+      if (emailJSConfig.serviceId && hasTemplates && emailJSConfig.publicKey) {
         const clientRes = await sendRealEmailViaEmailJS({
           toEmail: testEmail,
           toName: user?.name || 'Game Hub Player',
-          subject: '🚀 Game Hub Real Inbox Test Email',
+          templateType: testEmailType,
+          subject: testEmailType === 'order_receipt'
+            ? '🎮 Game Hub Order Confirmation Test'
+            : '🚀 Game Hub Welcome & Activation Test',
           message: 'This is a live test email sent directly through EmailJS to verify real inbox delivery!',
         });
         if (clientRes.success) {
@@ -138,9 +145,10 @@ export const EmailCenterModal = ({ onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md overflow-y-auto">
-      <div className="relative w-full max-w-5xl glass-panel rounded-3xl border border-cyan-500/40 shadow-2xl p-6 sm:p-8 my-8 animate-in fade-in zoom-in-95 duration-200">
-        <button
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/85 backdrop-blur-md p-4 sm:p-6">
+      <div className="min-h-full flex items-center justify-center py-6">
+        <div className="relative w-full max-w-5xl glass-panel rounded-3xl border border-cyan-500/40 shadow-2xl p-6 sm:p-8 animate-in fade-in zoom-in-95 duration-200">
+          <button
           onClick={onClose}
           className="absolute top-5 right-5 p-2 rounded-full bg-slate-900 border border-slate-700 text-slate-400 hover:text-white transition-all cursor-pointer"
         >
@@ -200,7 +208,7 @@ export const EmailCenterModal = ({ onClose }) => {
           <div className="space-y-4 pt-4">
             <div className="flex items-center justify-between text-xs text-slate-400">
               <p>
-                All automated transactional emails sent upon order purchases, disc listings, and C2C barter trades are captured below:
+                All automated transactional emails sent upon order purchases, disc listings, and game barter trades are captured below:
               </p>
               <button
                 onClick={fetchEmails}
@@ -303,7 +311,7 @@ export const EmailCenterModal = ({ onClose }) => {
                   <Sparkles className="w-4 h-4" /> System Administrator EmailJS Live Delivery Control
                 </div>
                 <p className="text-xs text-slate-300 leading-relaxed">
-                  Configure EmailJS (<a href="https://www.emailjs.com" target="_blank" rel="noreferrer" className="text-cyan-400 underline font-semibold">emailjs.com</a>) keys below. Once saved, <strong>all customer purchase invoices, seller order updates, and C2C trade proposals</strong> will be sent live to real inboxes!
+                  Configure EmailJS (<a href="https://www.emailjs.com" target="_blank" rel="noreferrer" className="text-cyan-400 underline font-semibold">emailjs.com</a>) keys below. Once saved, <strong>all customer purchase invoices, seller order updates, and game trade proposals</strong> will be sent live to real inboxes!
                 </p>
               </div>
 
@@ -350,6 +358,36 @@ export const EmailCenterModal = ({ onClose }) => {
                     />
                   </div>
 
+                  <div>
+                    <label className="text-[11px] font-bold uppercase tracking-wider text-slate-300 block mb-1.5 font-['Rajdhani']">
+                      Select Template to Test:
+                    </label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setTestEmailType('welcome')}
+                        className={`py-2 px-3 rounded-xl border text-xs font-bold font-['Rajdhani'] cursor-pointer transition-all flex items-center justify-center gap-1.5 ${
+                          testEmailType === 'welcome'
+                            ? 'bg-cyan-500/20 border-cyan-400 text-cyan-300 shadow-md shadow-cyan-500/10'
+                            : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white'
+                        }`}
+                      >
+                        <span>👋 Welcome Email</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setTestEmailType('order_receipt')}
+                        className={`py-2 px-3 rounded-xl border text-xs font-bold font-['Rajdhani'] cursor-pointer transition-all flex items-center justify-center gap-1.5 ${
+                          testEmailType === 'order_receipt'
+                            ? 'bg-purple-500/20 border-purple-400 text-purple-300 shadow-md shadow-purple-500/10'
+                            : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white'
+                        }`}
+                      >
+                        <span>🛒 Order Receipt</span>
+                      </button>
+                    </div>
+                  </div>
+
                   <button
                     type="submit"
                     disabled={testSending}
@@ -392,7 +430,7 @@ export const EmailCenterModal = ({ onClose }) => {
                 <div className="flex items-center justify-between">
                   <h3 className="font-bold text-white text-sm font-['Rajdhani'] uppercase tracking-wider flex items-center gap-1.5">
                     <Settings className="w-4 h-4 text-pink-400" />
-                    EmailJS API Credentials
+                    EmailJS Multi-Template Setup
                   </h3>
                   <span className="text-[10px] text-slate-400 font-mono">
                     Free Tier (200/mo)
@@ -400,43 +438,72 @@ export const EmailCenterModal = ({ onClose }) => {
                 </div>
 
                 <p className="text-xs text-slate-400">
-                  Save your keys below or in <code>backend/.env</code> to automatically dispatch emails on purchases, listings &amp; trades:
+                  Save your credentials below. The system automatically routes purchases and registrations to their corresponding templates:
                 </p>
 
                 <form onSubmit={handleSaveConfig} className="space-y-3">
                   <div>
-                    <label className="text-[11px] font-bold text-slate-400 block mb-1">
+                    <label className="text-[11px] font-bold text-slate-300 block mb-1">
                       Service ID (e.g. <code>service_xxx</code>):
                     </label>
                     <input
                       type="text"
-                      value={emailJSConfig.serviceId}
+                      value={emailJSConfig.serviceId || ''}
                       onChange={(e) => setEmailJSConfig({ ...emailJSConfig, serviceId: e.target.value })}
                       placeholder="service_gamehub"
                       className="w-full h-10 px-3 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs font-mono focus:border-pink-400 focus:outline-none"
                     />
                   </div>
 
-                  <div>
-                    <label className="text-[11px] font-bold text-slate-400 block mb-1">
-                      Template ID (e.g. <code>template_xxx</code>):
+                  {/* Template 1: Order Confirmation */}
+                  <div className="p-3 rounded-xl bg-purple-950/30 border border-purple-500/30 space-y-1">
+                    <label className="text-[11px] font-bold text-purple-300 flex items-center justify-between">
+                      <span>🛒 Template 1: Order Confirmation ID</span>
+                      <span className="text-[9px] px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-200 font-mono">Purchases</span>
                     </label>
                     <input
                       type="text"
-                      value={emailJSConfig.templateId}
-                      onChange={(e) => setEmailJSConfig({ ...emailJSConfig, templateId: e.target.value })}
-                      placeholder="template_gamehub"
-                      className="w-full h-10 px-3 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs font-mono focus:border-pink-400 focus:outline-none"
+                      value={emailJSConfig.templateOrder || emailJSConfig.templateId || ''}
+                      onChange={(e) =>
+                        setEmailJSConfig({
+                          ...emailJSConfig,
+                          templateOrder: e.target.value,
+                          templateId: e.target.value,
+                        })
+                      }
+                      placeholder="template_order_xxx"
+                      className="w-full h-9 px-3 rounded-lg bg-slate-950 border border-purple-700/60 text-white text-xs font-mono focus:border-purple-400 focus:outline-none"
                     />
+                    <p className="text-[10px] text-slate-400">
+                      Dispatched when a gamer completes checkout or when seller marks status as accepted/shipped.
+                    </p>
+                  </div>
+
+                  {/* Template 2: Welcome & Account Registration */}
+                  <div className="p-3 rounded-xl bg-cyan-950/30 border border-cyan-500/30 space-y-1">
+                    <label className="text-[11px] font-bold text-cyan-300 flex items-center justify-between">
+                      <span>👋 Template 2: Welcome / Registration ID</span>
+                      <span className="text-[9px] px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-200 font-mono">New Users &amp; Trades</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={emailJSConfig.templateWelcome || ''}
+                      onChange={(e) => setEmailJSConfig({ ...emailJSConfig, templateWelcome: e.target.value })}
+                      placeholder="template_welcome_xxx"
+                      className="w-full h-9 px-3 rounded-lg bg-slate-950 border border-cyan-700/60 text-white text-xs font-mono focus:border-cyan-400 focus:outline-none"
+                    />
+                    <p className="text-[10px] text-slate-400">
+                      Dispatched when new users register, when discs are listed, or when game barter swaps occur.
+                    </p>
                   </div>
 
                   <div>
-                    <label className="text-[11px] font-bold text-slate-400 block mb-1">
+                    <label className="text-[11px] font-bold text-slate-300 block mb-1">
                       Public Key (User ID):
                     </label>
                     <input
                       type="text"
-                      value={emailJSConfig.publicKey}
+                      value={emailJSConfig.publicKey || ''}
                       onChange={(e) => setEmailJSConfig({ ...emailJSConfig, publicKey: e.target.value })}
                       placeholder="user_xxx / public_key"
                       className="w-full h-10 px-3 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs font-mono focus:border-pink-400 focus:outline-none"
@@ -461,12 +528,12 @@ export const EmailCenterModal = ({ onClose }) => {
                     className="w-full h-11 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-400 hover:to-purple-500 text-white font-bold text-xs cursor-pointer shadow-lg shadow-pink-500/25 transition-all flex items-center justify-center gap-2"
                   >
                     <Sparkles className="w-4 h-4" />
-                    Save EmailJS Keys to Entire Platform (Live for All)
+                    Save EmailJS Multi-Templates to Entire Platform
                   </button>
 
                   {configSaved && (
                     <div className="text-[11px] text-emerald-400 text-center font-bold bg-emerald-500/10 p-2.5 rounded-xl border border-emerald-500/30">
-                      ✓ Active across platform: Live emails will now be sent to customers &amp; sellers!
+                      ✓ Active across platform: Multi-template routing live for all customers and sellers!
                     </div>
                   )}
                 </form>
@@ -496,6 +563,7 @@ export const EmailCenterModal = ({ onClose }) => {
             </div>
           </div>
         )}
+        </div>
       </div>
     </div>
   );

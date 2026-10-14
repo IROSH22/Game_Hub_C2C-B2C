@@ -16,6 +16,7 @@ router.get('/', optionalAuth, async (req, res) => {
       genre,
       condition,
       exchangeable,
+      listingType,
       minPrice,
       maxPrice,
       sort,
@@ -47,12 +48,19 @@ router.get('/', optionalAuth, async (req, res) => {
       query.condition = condition;
     }
 
-    if (exchangeable !== undefined && exchangeable !== '') {
+    // Sellers must never see pure barter/trade listings
+    if (req.user?.role === 'seller') {
+      query.price = { $gt: 0 };
+    } else if (listingType === 'buy') {
+      query.price = { $gt: 0 };
+    } else if (listingType === 'trade') {
+      query.exchangeable = true;
+    } else if (exchangeable !== undefined && exchangeable !== '' && exchangeable !== 'all') {
       query.exchangeable = exchangeable === 'true';
     }
 
     if (minPrice || maxPrice) {
-      query.price = {};
+      query.price = query.price || {};
       if (minPrice) query.price.$gte = Number(minPrice);
       if (maxPrice) query.price.$lte = Number(maxPrice);
     }
@@ -167,8 +175,19 @@ router.post('/', authMiddleware, async (req, res) => {
       screenshots,
     } = req.body;
 
-    if (!title || !platform || !genre || price === undefined) {
-      return res.status(400).json({ success: false, message: 'Title, platform, genre, and price are required.' });
+    const isExchange = Boolean(exchangeable);
+    const parsedPrice = isExchange ? Number(price || 0) : Number(price);
+
+    if (!title || !platform || !genre || (!isExchange && (price === undefined || isNaN(parsedPrice) || parsedPrice < 0))) {
+      return res.status(400).json({ success: false, message: 'Title, platform, genre, and price are required for store sales.' });
+    }
+
+    // Role restriction: Sellers can only sell in the store catalog, not barter/exchange
+    if (req.user.role === 'seller' && isExchange) {
+      return res.status(403).json({
+        success: false,
+        message: 'Official Sellers can only list games for retail sale in the Store Catalog. Game barter/exchange is exclusive to regular gamer accounts.',
+      });
     }
 
     const defaultImg =
@@ -183,11 +202,11 @@ router.post('/', authMiddleware, async (req, res) => {
       genre,
       condition: condition || (req.user.role === 'seller' ? 'Brand New' : 'Like New'),
       isNewGame: condition === 'Brand New',
-      price: Number(price),
-      originalPrice: Number(price) * 1.15,
+      price: parsedPrice,
+      originalPrice: parsedPrice > 0 ? parsedPrice * 1.15 : 0,
       stock: stock !== undefined ? Number(stock) : 1,
-      exchangeable: Boolean(exchangeable),
-      wantedGames: wantedGames || '',
+      exchangeable: req.user.role === 'seller' ? false : Boolean(exchangeable),
+      wantedGames: req.user.role === 'seller' ? '' : (wantedGames || ''),
       imageUrl: defaultImg,
       screenshots: Array.isArray(screenshots) ? screenshots : [defaultImg],
       status: 'Active',

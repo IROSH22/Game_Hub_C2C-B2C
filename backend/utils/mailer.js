@@ -26,25 +26,37 @@ try {
  */
 const sendViaEmailJS = async ({ to, toName, subject, message, htmlContent, templateType, details = {} }) => {
   const serviceId = process.env.EMAILJS_SERVICE_ID;
-  const templateId = process.env.EMAILJS_TEMPLATE_ID;
   const publicKey = process.env.EMAILJS_PUBLIC_KEY;
   const privateKey = process.env.EMAILJS_PRIVATE_KEY;
 
-  if (!serviceId || !templateId || !publicKey) {
-    return { attempted: false, success: false, reason: 'EmailJS credentials not set in .env' };
+  // Dynamic Multi-Template Routing:
+  // 1. Order Confirmation & Invoice Template
+  const orderTemplateId = process.env.EMAILJS_TEMPLATE_ORDER || process.env.EMAILJS_TEMPLATE_ID;
+  // 2. Welcome / Registration & General Notification Template
+  const welcomeTemplateId = process.env.EMAILJS_TEMPLATE_WELCOME || process.env.EMAILJS_TEMPLATE_ID;
+
+  let chosenTemplateId = process.env.EMAILJS_TEMPLATE_ID;
+  if (templateType === 'order_receipt' || templateType === 'order_status_update') {
+    chosenTemplateId = orderTemplateId || process.env.EMAILJS_TEMPLATE_ID;
+  } else {
+    chosenTemplateId = welcomeTemplateId || orderTemplateId || process.env.EMAILJS_TEMPLATE_ID;
+  }
+
+  if (!serviceId || !chosenTemplateId || !publicKey) {
+    return { attempted: false, success: false, reason: 'EmailJS credentials or template not set' };
   }
 
   try {
     const payload = {
       service_id: serviceId,
-      template_id: templateId,
+      template_id: chosenTemplateId,
       user_id: publicKey,
       accessToken: privateKey || undefined,
       template_params: {
         to_email: to,
         to_name: toName || 'Game Hub Gamer',
-        from_name: 'Game Hub Platform',
-        reply_to: 'support@gamehub.com',
+        from_name: 'Game Hub Marketplace',
+        reply_to: 'support@gamehub.lk',
         subject: subject,
         message: message || subject,
         html_content: htmlContent,
@@ -86,66 +98,96 @@ const sendEmailNotification = async ({ to, toName, subject, templateType, data =
     const { order, buyer } = data;
     plainTextSummary = `Order #${order._id.toString().slice(-8).toUpperCase()} placed. Total: $${order.totalAmount}. Method: ${order.paymentMethod}.`;
     html = `
-      <!DOCTYPE html>
-      <html>
+      <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+      <html xmlns="http://www.w3.org/1999/xhtml">
       <head>
-        <meta charset="utf-8">
-        <style>
-          body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #070a13; color: #e2e8f0; margin: 0; padding: 20px; }
-          .container { max-width: 600px; margin: 0 auto; background: #0e1526; border: 1px solid #1e293b; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.6); }
-          .header { background: linear-gradient(135deg, #00f0ff, #8b5cf6, #ec4899); padding: 30px 20px; text-align: center; color: #070a13; }
-          .logo { font-size: 26px; font-weight: 900; letter-spacing: 1px; }
-          .badge { display: inline-block; background: rgba(7,10,19,0.8); padding: 6px 14px; border-radius: 20px; font-size: 13px; color: #00f0ff; margin-top: 8px; font-weight: bold; }
-          .content { padding: 30px; }
-          .receipt-box { background: #070a13; border: 1px solid #1e293b; border-radius: 12px; padding: 20px; margin: 20px 0; }
-          .item-row { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #1e293b; padding: 12px 0; }
-          .total-row { display: flex; justify-content: space-between; font-size: 18px; font-weight: bold; color: #00f0ff; margin-top: 15px; border-top: 2px solid #334155; padding-top: 15px; }
-          .footer { text-align: center; padding: 20px; font-size: 11px; color: #64748b; border-top: 1px solid #1e293b; }
-        </style>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Order Receipt</title>
       </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <div class="logo">🎮 GAME HUB HYBRID MARKETPLACE</div>
-            <div class="badge">Official Order Receipt #${order._id.toString().slice(-8).toUpperCase()}</div>
-          </div>
-          <div class="content">
-            <h2 style="color: #ffffff; margin-top: 0;">Order Confirmed, ${toName || 'Gamer'}!</h2>
-            <p style="color: #94a3b8; font-size: 14px;">Your video game order has been secured with automated Escrow buyer protection. Our seller network is packaging your physical disc(s).</p>
-            
-            <div class="receipt-box">
-              <div style="font-size: 13px; color: #94a3b8; margin-bottom: 15px; line-height: 1.6;">
-                <strong>Transaction ID:</strong> ${order.transactionId}<br>
-                <strong>Payment Method:</strong> ${order.paymentMethod} (ending in ${order.cardLast4 || '4242'})<br>
-                <strong>Delivery Address:</strong> ${order.shippingAddress?.fullName}, ${order.shippingAddress?.address}, ${order.shippingAddress?.city}
-              </div>
+      <body style="margin: 0; padding: 0; background-color: #060913; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+        <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#060913" style="background-color: #060913; width: 100%; margin: 0; padding: 30px 10px;">
+          <tr>
+            <td align="center" valign="top">
+              <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#0d1527" style="max-width: 600px; width: 100%; background-color: #0d1527; border: 1px solid #1e293b; border-radius: 18px; overflow: hidden; box-shadow: 0 10px 30px rgba(0, 240, 255, 0.15);">
+                <tr>
+                  <td bgcolor="#00f0ff" align="center" style="background-color: #00f0ff; background: linear-gradient(135deg, #00f0ff 0%, #8b5cf6 50%, #ec4899 100%); padding: 32px 20px; text-align: center;">
+                    <div style="font-size: 24px; font-weight: 900; color: #070a13; letter-spacing: 1.5px; text-transform: uppercase;">🎮 GAME HUB MARKETPLACE</div>
+                    <div style="margin-top: 8px;">
+                      <span style="display: inline-block; background-color: #070a13; color: #00f0ff; padding: 6px 16px; border-radius: 50px; font-size: 12px; font-weight: 800; text-transform: uppercase;">
+                        Official Order Receipt #${order._id.toString().slice(-8).toUpperCase()}
+                      </span>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 30px 26px; background-color: #0d1527;">
+                    <h2 style="font-size: 22px; font-weight: 800; color: #ffffff; margin: 0 0 10px 0;">Order Confirmed, ${toName || 'Gamer'}! 🎉</h2>
+                    <p style="font-size: 14px; line-height: 1.6; color: #94a3b8; margin: 0 0 20px 0;">
+                      Your video game order is secured with automated Escrow protection. Our verified seller network is preparing your physical disc(s).
+                    </p>
+                    
+                    <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#070b16" style="background-color: #070b16; border: 1px solid #1e293b; border-radius: 12px; margin-bottom: 20px;">
+                      <tr>
+                        <td style="padding: 18px; font-size: 13px; color: #94a3b8; line-height: 1.6;">
+                          <strong style="color: #cbd5e1;">Transaction ID:</strong> ${order.transactionId}<br>
+                          <strong style="color: #cbd5e1;">Payment Method:</strong> ${order.paymentMethod} (ending in ${order.cardLast4 || '4242'})<br>
+                          <strong style="color: #cbd5e1;">Delivery Destination:</strong> ${order.shippingAddress?.fullName}, ${order.shippingAddress?.address}, ${order.shippingAddress?.city}
+                        </td>
+                      </tr>
+                      ${(order.items || [])
+                        .map(
+                          (item) => `
+                        <tr>
+                          <td style="padding: 12px 18px; border-top: 1px solid #1e293b;">
+                            <table width="100%" border="0" cellpadding="0" cellspacing="0">
+                              <tr>
+                                <td>
+                                  <div style="color: #f1f5f9; font-weight: 700; font-size: 14px;">${item.title}</div>
+                                  <div style="font-size: 12px; color: #94a3b8;">${item.platform} • Qty: ${item.quantity} • ${item.condition || 'Tested'}</div>
+                                </td>
+                                <td align="right" style="color: #00f0ff; font-weight: 800; font-size: 15px;">
+                                  $${(item.price * item.quantity).toFixed(2)}
+                                </td>
+                              </tr>
+                            </table>
+                          </td>
+                        </tr>
+                      `
+                        )
+                        .join('')}
+                      <tr>
+                        <td style="padding: 16px 18px; border-top: 2px solid #334155;">
+                          <table width="100%" border="0" cellpadding="0" cellspacing="0">
+                            <tr>
+                              <td style="font-size: 16px; font-weight: 800; color: #cbd5e1;">Total Amount Paid</td>
+                              <td align="right" style="font-size: 19px; font-weight: 900; color: #00f0ff;">$${Number(order.totalAmount).toFixed(2)}</td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
 
-              ${(order.items || [])
-                .map(
-                  (item) => `
-                <div class="item-row">
-                  <div>
-                    <strong style="color: #f1f5f9; font-size: 14px;">${item.title}</strong>
-                    <div style="font-size: 12px; color: #94a3b8;">${item.platform} • Qty: ${item.quantity} • ${item.condition || 'Tested'}</div>
-                  </div>
-                  <div style="color: #00f0ff; font-weight: 700; font-size: 15px;">$${(item.price * item.quantity).toFixed(2)}</div>
-                </div>
-              `
-                )
-                .join('')}
-
-              <div class="total-row">
-                <span>Total Paid</span>
-                <span>$${Number(order.totalAmount).toFixed(2)}</span>
-              </div>
-            </div>
-
-            <p style="color: #94a3b8; font-size: 13px;">Track your live delivery status in <strong>Game Hub > My Orders</strong>.</p>
-          </div>
-          <div class="footer">
-            Game Hub E-Commerce Platform • IT32053 • Horizon Campus
-          </div>
-        </div>
+                    <table width="100%" border="0" cellpadding="0" cellspacing="0" style="margin: 25px 0 10px 0;">
+                      <tr>
+                        <td align="center">
+                          <a href="http://localhost:5173" target="_blank" style="background-color: #00f0ff; background: linear-gradient(135deg, #00f0ff 0%, #3b82f6 100%); color: #070a13 !important; font-size: 13px; font-weight: 900; text-decoration: none; padding: 14px 32px; border-radius: 12px; display: inline-block; text-transform: uppercase;">
+                            Track Order in Game Hub
+                          </a>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td bgcolor="#070a14" align="center" style="background-color: #070a14; border-top: 1px solid #1e293b; padding: 18px 20px; text-align: center; font-size: 11px; color: #64748b;">
+                    Game Hub E-Commerce Ecosystem • Horizon Campus (IT32053) • Colombo, Sri Lanka
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
       </body>
       </html>
     `;
@@ -317,6 +359,100 @@ const sendEmailNotification = async ({ to, toName, subject, templateType, data =
     `;
   }
 
+  // 6. Template: Welcome to Game Hub (Registration)
+  else if (templateType === 'welcome') {
+    const { user, role } = data;
+    plainTextSummary = `Welcome to Game Hub, ${toName || 'Gamer'}! Your new account has been created. Start browsing authentic physical game discs or barter game-for-game with zero fees!`;
+    html = `
+      <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+      <html xmlns="http://www.w3.org/1999/xhtml">
+      <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Welcome to Game Hub</title>
+      </head>
+      <body style="margin: 0; padding: 0; background-color: #060913; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+        <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#060913" style="background-color: #060913; width: 100%; margin: 0; padding: 30px 10px;">
+          <tr>
+            <td align="center" valign="top">
+              <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#0d1527" style="max-width: 600px; width: 100%; background-color: #0d1527; border: 1px solid #1e293b; border-radius: 18px; overflow: hidden; box-shadow: 0 10px 30px rgba(0, 240, 255, 0.15);">
+                <tr>
+                  <td bgcolor="#00f0ff" align="center" style="background-color: #00f0ff; background: linear-gradient(135deg, #00f0ff 0%, #8b5cf6 50%, #ec4899 100%); padding: 35px 20px; text-align: center;">
+                    <div style="font-size: 26px; font-weight: 900; color: #070a13; letter-spacing: 1.5px; text-transform: uppercase;">🎮 GAME HUB MARKETPLACE</div>
+                    <div style="margin-top: 10px;">
+                      <span style="display: inline-block; background-color: #070a13; color: #00f0ff; padding: 6px 18px; border-radius: 50px; font-size: 12px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase;">
+                        Official Member Activation
+                      </span>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 32px 28px; background-color: #0d1527;">
+                    <h1 style="font-size: 24px; font-weight: 800; color: #ffffff; margin: 0 0 12px 0;">Welcome Aboard, ${toName || 'Gamer'}! 🚀</h1>
+                    <p style="font-size: 14px; line-height: 1.6; color: #94a3b8; margin: 0 0 24px 0;">
+                      Your Game Hub gamer account is now officially verified and active. You are now part of Sri Lanka's leading hybrid gaming ecosystem — built for genuine gamers, disc collectors, and verified sellers.
+                    </p>
+
+                    <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#070b16" style="background-color: #070b16; border: 1px solid #1e293b; border-radius: 14px; margin-bottom: 24px;">
+                      <tr>
+                        <td style="padding: 20px;">
+                          <div style="font-size: 13px; color: #00f0ff; text-transform: uppercase; font-weight: 800; letter-spacing: 1px; margin-bottom: 14px;">
+                            What you can do on Game Hub:
+                          </div>
+                          <div style="margin-bottom: 12px; font-size: 13px; line-height: 1.5; color: #cbd5e1;">
+                            <strong style="color: #00f0ff;">🛒 B2C Retail Store:</strong> Buy original, inspected PlayStation, Xbox, and Nintendo game discs with 100% Escrow buyer protection.
+                          </div>
+                          <div style="margin-bottom: 12px; font-size: 13px; line-height: 1.5; color: #cbd5e1;">
+                            <strong style="color: #a855f7;">🔄 C2C Swap Zone:</strong> Finished playing a game? Trade your physical disc with fellow gamers island-wide with zero listing fees.
+                          </div>
+                          <div style="margin-bottom: 12px; font-size: 13px; line-height: 1.5; color: #cbd5e1;">
+                            <strong style="color: #eab308;">🔔 Wishlist Radar:</strong> Add titles to your wishlist; our automated system notifies you the moment another gamer lists it!
+                          </div>
+                          <div style="margin-bottom: 0; font-size: 13px; line-height: 1.5; color: #cbd5e1;">
+                            <strong style="color: #10b981;">🛡️ Trust &amp; Reputation:</strong> Complete trades and purchases to earn Community Badges and high trust scores.
+                          </div>
+                        </td>
+                      </tr>
+                    </table>
+
+                    <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#091830" style="background-color: #091830; border-left: 4px solid #00f0ff; border-radius: 8px; margin-bottom: 26px;">
+                      <tr>
+                        <td style="padding: 14px 18px; font-size: 13px; color: #38bdf8; font-style: italic;">
+                          💡 <em>Welcome to Game Hub! Discover hundreds of pre-owned and sealed video games.</em>
+                        </td>
+                      </tr>
+                    </table>
+
+                    <table width="100%" border="0" cellpadding="0" cellspacing="0" style="margin: 28px 0 10px 0;">
+                      <tr>
+                        <td align="center">
+                          <a href="http://localhost:5173" target="_blank" style="background-color: #00f0ff; background: linear-gradient(135deg, #00f0ff 0%, #3b82f6 100%); color: #070a13 !important; font-size: 14px; font-weight: 900; text-decoration: none; padding: 15px 36px; border-radius: 12px; display: inline-block; text-transform: uppercase; letter-spacing: 0.5px;">
+                            Launch Game Hub &amp; Explore
+                          </a>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td bgcolor="#070a14" align="center" style="background-color: #070a14; border-top: 1px solid #1e293b; padding: 22px 20px; text-align: center;">
+                    <div style="font-size: 12px; color: #64748b; line-height: 1.6;">
+                      Account Email: <strong style="color: #00f0ff;">${to}</strong>
+                    </div>
+                    <div style="margin-top: 6px; font-size: 11px; color: #475569;">
+                      © 2026 Game Hub Hybrid E-Commerce Ecosystem • Horizon Campus (IT32053)
+                    </div>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </body>
+      </html>
+    `;
+  }
+
   // Default Fallback
   else {
     plainTextSummary = data.message || subject;
@@ -330,6 +466,9 @@ const sendEmailNotification = async ({ to, toName, subject, templateType, data =
 
   // Attempt EmailJS Dispatch First (Live real inbox delivery)
   let status = 'Simulated';
+  let deliverySuccess = false;
+  let deliveryReason = '';
+
   const emailJSRes = await sendViaEmailJS({
     to,
     toName,
@@ -342,6 +481,10 @@ const sendEmailNotification = async ({ to, toName, subject, templateType, data =
 
   if (emailJSRes.success) {
     status = 'Sent (EmailJS Live)';
+    deliverySuccess = true;
+  } else if (emailJSRes.attempted) {
+    status = `Failed: ${emailJSRes.reason || 'EmailJS error'}`;
+    deliveryReason = emailJSRes.reason;
   } else if (transporter) {
     try {
       await transporter.sendMail({
@@ -351,10 +494,14 @@ const sendEmailNotification = async ({ to, toName, subject, templateType, data =
         html,
       });
       status = 'Sent (SMTP Live)';
+      deliverySuccess = true;
     } catch (e) {
       console.log('SMTP error:', e.message);
       status = 'Simulated';
     }
+  } else {
+    status = 'Simulated (Credentials missing)';
+    deliveryReason = emailJSRes.reason || 'EmailJS Public Key or Service ID not configured';
   }
 
   // Log in database
@@ -367,10 +514,10 @@ const sendEmailNotification = async ({ to, toName, subject, templateType, data =
       htmlContent: html,
       status,
     });
-    return emailRecord;
+    return { emailRecord, deliverySuccess, reason: deliveryReason, status };
   } catch (err) {
     console.error('Failed to log email:', err.message);
-    return null;
+    return { emailRecord: null, deliverySuccess, reason: deliveryReason, status };
   }
 };
 

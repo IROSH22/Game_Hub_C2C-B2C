@@ -15,6 +15,8 @@ export const getStoredEmailJSConfig = () => {
   return {
     serviceId: import.meta.env.VITE_EMAILJS_SERVICE_ID || '',
     templateId: import.meta.env.VITE_EMAILJS_TEMPLATE_ID || '',
+    templateOrder: import.meta.env.VITE_EMAILJS_TEMPLATE_ORDER || import.meta.env.VITE_EMAILJS_TEMPLATE_ID || '',
+    templateWelcome: import.meta.env.VITE_EMAILJS_TEMPLATE_WELCOME || '',
     publicKey: import.meta.env.VITE_EMAILJS_PUBLIC_KEY || '',
   };
 };
@@ -31,21 +33,27 @@ export const sendRealEmailViaEmailJS = async ({
   toName,
   subject,
   message,
+  templateType = 'general',
   templateParams = {},
 }) => {
   const config = getStoredEmailJSConfig();
-  if (!config.serviceId || !config.templateId || !config.publicKey) {
+  const effectiveTemplateId =
+    templateType === 'order_receipt' || templateType === 'order_status_update'
+      ? (config.templateOrder || config.templateId)
+      : (config.templateWelcome || config.templateOrder || config.templateId);
+
+  if (!config.serviceId || !effectiveTemplateId || !config.publicKey) {
     return {
       success: false,
       isConfigured: false,
-      message: 'EmailJS keys not configured. Enter your Service ID, Template ID, and Public Key.',
+      message: 'EmailJS keys not configured. Enter your Service ID, Template IDs, and Public Key.',
     };
   }
 
   try {
     const payload = {
       service_id: config.serviceId,
-      template_id: config.templateId,
+      template_id: effectiveTemplateId,
       user_id: config.publicKey,
       template_params: {
         to_email: toEmail,

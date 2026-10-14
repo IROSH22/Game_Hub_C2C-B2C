@@ -62,9 +62,10 @@ export const AuthModal = ({ onClose, onSuccess }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md overflow-y-auto">
-      <div className="relative w-full max-w-lg glass-panel rounded-3xl border border-cyan-500/30 shadow-2xl p-6 sm:p-8 my-8 animate-in fade-in zoom-in-95 duration-200">
-        <button
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/85 backdrop-blur-md p-4 sm:p-6">
+      <div className="min-h-full flex items-center justify-center py-6">
+        <div className="relative w-full max-w-lg glass-panel rounded-3xl border border-cyan-500/30 shadow-2xl p-6 sm:p-8 animate-in fade-in zoom-in-95 duration-200">
+          <button
           onClick={onClose}
           className="absolute top-5 right-5 p-2 rounded-full bg-slate-900 border border-slate-700 text-slate-400 hover:text-white hover:border-slate-500 transition-all cursor-pointer"
           aria-label="Close modal"
@@ -105,7 +106,7 @@ export const AuthModal = ({ onClose, onSuccess }) => {
             >
               <div className="text-xs font-black text-white group-hover:text-cyan-300 flex items-center justify-between font-['Rajdhani']">
                 <span>🎮 Gamer Alex</span>
-                <span className="text-[9px] px-1 rounded bg-cyan-500/20 text-cyan-300 font-mono">C2C</span>
+                <span className="text-[9px] px-1 rounded bg-cyan-500/20 text-cyan-300 font-mono">GAMER</span>
               </div>
               <div className="text-[10px] text-slate-400 mt-0.5 truncate">gamer@gamehub.com</div>
               <div className="text-[10px] text-emerald-400 font-bold mt-1 flex items-center gap-1">
@@ -121,7 +122,7 @@ export const AuthModal = ({ onClose, onSuccess }) => {
             >
               <div className="text-xs font-black text-white group-hover:text-pink-300 flex items-center justify-between font-['Rajdhani']">
                 <span>🏪 Nexus Store</span>
-                <span className="text-[9px] px-1 rounded bg-pink-500/20 text-pink-300 font-mono">B2C</span>
+                <span className="text-[9px] px-1 rounded bg-pink-500/20 text-pink-300 font-mono">SELLER</span>
               </div>
               <div className="text-[10px] text-slate-400 mt-0.5 truncate">seller@gamehub.com</div>
               <div className="text-[10px] text-pink-400 font-bold mt-1 flex items-center gap-1">
@@ -317,6 +318,7 @@ export const AuthModal = ({ onClose, onSuccess }) => {
             )}
           </button>
         </form>
+        </div>
       </div>
     </div>
   );

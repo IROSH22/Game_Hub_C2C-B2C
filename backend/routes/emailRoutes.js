@@ -41,7 +41,7 @@ router.get('/:id', authMiddleware, async (req, res) => {
 router.get('/config/status', async (req, res) => {
   const isEmailJSConfigured = Boolean(
     process.env.EMAILJS_SERVICE_ID &&
-    process.env.EMAILJS_TEMPLATE_ID &&
+    (process.env.EMAILJS_TEMPLATE_ORDER || process.env.EMAILJS_TEMPLATE_ID) &&
     process.env.EMAILJS_PUBLIC_KEY
   );
 
@@ -51,13 +51,15 @@ router.get('/config/status', async (req, res) => {
       configured: isEmailJSConfigured,
       serviceId: process.env.EMAILJS_SERVICE_ID || '',
       templateId: process.env.EMAILJS_TEMPLATE_ID || '',
+      templateOrder: process.env.EMAILJS_TEMPLATE_ORDER || process.env.EMAILJS_TEMPLATE_ID || '',
+      templateWelcome: process.env.EMAILJS_TEMPLATE_WELCOME || '',
       publicKey: process.env.EMAILJS_PUBLIC_KEY || '',
     },
     smtp: {
       configured: Boolean(process.env.SMTP_USER && process.env.SMTP_PASS),
     },
     message: isEmailJSConfigured
-      ? 'EmailJS is actively configured for real inbox delivery.'
+      ? 'EmailJS is actively configured for real inbox delivery with multi-template routing.'
       : 'EmailJS is running in simulation mode. Admin can save keys to deliver to real inboxes.',
   });
 });
@@ -69,11 +71,13 @@ router.post('/config', authMiddleware, async (req, res) => {
       return res.status(403).json({ success: false, message: 'Forbidden. Only System Admin can configure email service.' });
     }
 
-    const { serviceId, templateId, publicKey, privateKey } = req.body;
+    const { serviceId, templateId, templateOrder, templateWelcome, publicKey, privateKey } = req.body;
 
     // Update in-memory process.env immediately
     if (serviceId !== undefined) process.env.EMAILJS_SERVICE_ID = String(serviceId).trim();
     if (templateId !== undefined) process.env.EMAILJS_TEMPLATE_ID = String(templateId).trim();
+    if (templateOrder !== undefined) process.env.EMAILJS_TEMPLATE_ORDER = String(templateOrder).trim();
+    if (templateWelcome !== undefined) process.env.EMAILJS_TEMPLATE_WELCOME = String(templateWelcome).trim();
     if (publicKey !== undefined) process.env.EMAILJS_PUBLIC_KEY = String(publicKey).trim();
     if (privateKey !== undefined) process.env.EMAILJS_PRIVATE_KEY = String(privateKey).trim();
 
@@ -96,21 +100,29 @@ router.post('/config', authMiddleware, async (req, res) => {
 
       if (serviceId !== undefined) updateOrAppend('EMAILJS_SERVICE_ID', String(serviceId).trim());
       if (templateId !== undefined) updateOrAppend('EMAILJS_TEMPLATE_ID', String(templateId).trim());
+      if (templateOrder !== undefined) updateOrAppend('EMAILJS_TEMPLATE_ORDER', String(templateOrder).trim());
+      if (templateWelcome !== undefined) updateOrAppend('EMAILJS_TEMPLATE_WELCOME', String(templateWelcome).trim());
       if (publicKey !== undefined) updateOrAppend('EMAILJS_PUBLIC_KEY', String(publicKey).trim());
       if (privateKey !== undefined) updateOrAppend('EMAILJS_PRIVATE_KEY', String(privateKey).trim());
 
       fs.writeFileSync(envPath, envContent, 'utf8');
     }
 
-    const isLive = Boolean(process.env.EMAILJS_SERVICE_ID && process.env.EMAILJS_TEMPLATE_ID && process.env.EMAILJS_PUBLIC_KEY);
+    const isLive = Boolean(
+      process.env.EMAILJS_SERVICE_ID &&
+      (process.env.EMAILJS_TEMPLATE_ORDER || process.env.EMAILJS_TEMPLATE_ID) &&
+      process.env.EMAILJS_PUBLIC_KEY
+    );
 
     res.json({
       success: true,
-      message: 'EmailJS credentials saved successfully to backend system! All customer and seller emails will now be sent live.',
+      message: 'EmailJS credentials and multi-templates saved successfully to backend system! All customer and seller emails will now be sent live.',
       configured: isLive,
       emailjs: {
         serviceId: process.env.EMAILJS_SERVICE_ID,
         templateId: process.env.EMAILJS_TEMPLATE_ID,
+        templateOrder: process.env.EMAILJS_TEMPLATE_ORDER,
+        templateWelcome: process.env.EMAILJS_TEMPLATE_WELCOME,
         publicKey: process.env.EMAILJS_PUBLIC_KEY,
       },
     });
@@ -120,28 +132,68 @@ router.post('/config', authMiddleware, async (req, res) => {
   }
 });
 
-// Test real email dispatch to any recipient
+// Test real email dispatch to any recipient (supports testing order or welcome templates)
 router.post('/test-send', authMiddleware, async (req, res) => {
   try {
-    const { targetEmail, targetName } = req.body;
+    const { targetEmail, targetName, templateType = 'welcome' } = req.body;
     const recipient = targetEmail || req.user.email;
     const recipientName = targetName || req.user.name;
+
+    const isOrderTest = templateType === 'order_receipt' || templateType === 'order';
+    const effectiveType = isOrderTest ? 'order_receipt' : 'welcome';
+    const subject = isOrderTest
+      ? '🎮 Game Hub Order Confirmation Receipt (Live Test #GH-8492)'
+      : '🚀 Welcome to Game Hub Marketplace! (Live Test Verification)';
+
+    const testData = isOrderTest
+      ? {
+          order: {
+            _id: '6615b1a8f90c19729de860ea',
+            transactionId: 'TXN-GH-LIVE-TEST',
+            paymentMethod: 'Visa / Mastercard',
+            cardLast4: '4242',
+            totalAmount: 59.99,
+            shippingAddress: {
+              fullName: recipientName,
+              address: 'No. 22 Galle Road',
+              city: 'Colombo 03',
+            },
+            items: [
+              {
+                title: 'Marvel Spider-Man 2 - Collectors Edition',
+                platform: 'PlayStation 5',
+                quantity: 1,
+                price: 59.99,
+                condition: 'Mint / Tested',
+              },
+            ],
+          },
+          buyer: { name: recipientName, email: recipient },
+        }
+      : {
+          user: { name: recipientName, email: recipient },
+          role: 'Gamer & Seller',
+          message: `Welcome to Game Hub! This is a live email test confirming that your EmailJS Welcome template is successfully dispatched to ${recipient}.`,
+        };
 
     const { sendEmailNotification } = require('../utils/mailer');
     const result = await sendEmailNotification({
       to: recipient,
       toName: recipientName,
-      subject: '🚀 Game Hub Live Test Email (Real Inbox Verification)',
-      templateType: 'general',
-      data: {
-        message: `This is a live test email sent from Game Hub Hybrid E-Commerce Marketplace to verify real inbox delivery for ${recipientName} (${recipient})!`,
-      },
+      subject,
+      templateType: effectiveType,
+      data: testData,
     });
 
+    const isLiveSuccess = Boolean(result?.deliverySuccess);
+    const failureMsg = result?.reason || (result?.status?.startsWith('Failed') ? result.status : null);
+
     res.json({
-      success: true,
-      message: `Test email processed for ${recipient}! Status: ${result?.status || 'Dispatched'}`,
-      emailRecord: result,
+      success: isLiveSuccess,
+      message: isLiveSuccess
+        ? `✅ Success! Real email (${effectiveType}) delivered live to ${recipient} inbox!`
+        : `⚠️ EmailJS delivery issue: ${failureMsg || 'Please check your Public Key in EmailJS Dashboard.'}`,
+      emailRecord: result?.emailRecord || result,
     });
   } catch (err) {
     console.error('Test send error:', err);
