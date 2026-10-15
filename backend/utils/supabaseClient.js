@@ -1,29 +1,46 @@
+const path = require('path');
+const dotenv = require('dotenv');
+
+// Always ensure backend/.env is loaded regardless of current working directory
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
+
 const { createClient } = require('@supabase/supabase-js');
 
 const SUPABASE_URL = process.env.SUPABASE_URL || 'https://mdemadyzfrlmymwgmelk.supabase.co';
-const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || '';
 
 let supabase = null;
-if (SUPABASE_URL && SUPABASE_KEY) {
-  try {
-    supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
-      auth: {
-        persistSession: false,
-        autoRefreshToken: false,
-      },
-    });
-    console.log(`⚡ Supabase Client initialized for: ${SUPABASE_URL}`);
-  } catch (err) {
-    console.warn('⚠️ Supabase initialization warning:', err.message);
+
+function initSupabase() {
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
+  if (!key) return null;
+  if (!supabase) {
+    try {
+      supabase = createClient(SUPABASE_URL, key, {
+        auth: {
+          persistSession: false,
+          autoRefreshToken: false,
+        },
+      });
+      console.log(`⚡ Supabase Client initialized for: ${SUPABASE_URL}`);
+    } catch (err) {
+      console.warn('⚠️ Supabase initialization warning:', err.message);
+    }
   }
+  return supabase;
 }
 
-const getSupabase = () => supabase;
+// Initial attempt
+initSupabase();
 
-const isSupabaseLive = () => Boolean(supabase && SUPABASE_KEY);
+const getSupabase = () => supabase || initSupabase();
+
+const isSupabaseLive = () => {
+  const client = getSupabase();
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
+  return Boolean(client && key);
+};
 
 module.exports = {
-  supabase,
   getSupabase,
   isSupabaseLive,
   SUPABASE_URL,

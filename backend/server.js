@@ -1,6 +1,5 @@
 const express = require('express');
 const cors = require('cors');
-const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const dns = require('dns');
 
@@ -9,7 +8,11 @@ if (dns.setDefaultResultOrder) {
   dns.setDefaultResultOrder('ipv4first');
 }
 
-dotenv.config();
+const path = require('path');
+dotenv.config({ path: path.resolve(__dirname, '.env') });
+
+const { isSupabaseLive, SUPABASE_URL } = require('./utils/supabaseClient');
+const seedSupabaseData = require('./utils/supabaseSeed');
 
 const authRoutes = require('./routes/authRoutes');
 const gameRoutes = require('./routes/gameRoutes');
@@ -19,11 +22,9 @@ const notificationRoutes = require('./routes/notificationRoutes');
 const emailRoutes = require('./routes/emailRoutes');
 const sellerRoutes = require('./routes/sellerRoutes');
 const adminRoutes = require('./routes/adminRoutes');
-const seedDatabase = require('./utils/seedData');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/gamehub';
 
 // Middleware
 app.use(cors({ origin: true, credentials: true }));
@@ -46,7 +47,8 @@ app.get('/api/health', (req, res) => {
     status: 'online',
     appName: 'Game Hub API',
     module: 'IT32053 - E-Commerce',
-    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+    database: isSupabaseLive() ? 'connected (Supabase Cloud PostgreSQL)' : 'disconnected',
+    databaseUrl: SUPABASE_URL,
     timestamp: new Date().toISOString(),
   });
 });
@@ -60,31 +62,28 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Database Connection Function with Caching for Serverless / Cloud
-let isConnected = false;
-const connectDB = async () => {
-  if (isConnected || mongoose.connection.readyState === 1) {
-    return;
-  }
+// Database Synchronization with Caching
+let isSeeded = false;
+const initDB = async () => {
+  if (isSeeded) return;
   try {
-    await mongoose.connect(MONGODB_URI);
-    isConnected = true;
-    console.log(`🚀 Connected to MongoDB at ${MONGODB_URI}`);
-    await seedDatabase();
+    console.log(`🚀 Supabase Cloud Database active at ${SUPABASE_URL}`);
+    await seedSupabaseData();
+    isSeeded = true;
   } catch (err) {
-    console.error('❌ MongoDB Connection Error:', err.message);
+    console.error('❌ Supabase Init Error:', err.message);
   }
 };
 
-// Middleware to ensure DB connection on serverless requests
+// Middleware to ensure DB is initialized on serverless requests
 app.use(async (req, res, next) => {
-  await connectDB();
+  await initDB();
   next();
 });
 
 // Start Standalone Server if run directly
 if (require.main === module) {
-  connectDB().then(() => {
+  initDB().then(() => {
     app.listen(PORT, () => {
       console.log(`🎮 Game Hub Backend API listening on http://localhost:${PORT}`);
     });
