@@ -41,6 +41,18 @@ app.use('/api/emails', emailRoutes);
 app.use('/api/seller', sellerRoutes);
 app.use('/api/admin', adminRoutes);
 
+// Root Health Check & Welcome Endpoint
+app.get('/', (req, res) => {
+  res.json({
+    status: 'online',
+    appName: 'Game Hub API',
+    module: 'IT32053 - E-Commerce',
+    database: isSupabaseLive() ? 'connected (Supabase Cloud PostgreSQL)' : 'disconnected',
+    health: '/api/health',
+    timestamp: new Date().toISOString(),
+  });
+});
+
 // Health Check
 app.get('/api/health', (req, res) => {
   res.json({
